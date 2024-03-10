@@ -1,8 +1,8 @@
 ########################################
 ##  NOAA/OSU post-doc (NCC Copepods)
-##  Step 2: Plot nMDS yearly scores
+##  Step 1b: Plot nMDS scores - yearly timeseries
 ##  Laura E. Lilly
-##  Updated: 18 May 2023
+##  Updated: 10 Mar 2024
 ########################################
 # From saved file ('Lilly_etal_NCC_CopePhys_S1_nMDS):
 #   -> plot yearly timeseries of nMDS scores
@@ -12,7 +12,6 @@ library(tidyverse)
 library(lubridate)
 library(mgcv)
 library(tidygam)
-# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 
 # Open datafile
@@ -24,11 +23,6 @@ colnames(scrfl) <- c("Samp_Date","NMDS1","NMDS2")
 # ### Step 0: Convert file days -> R Dates
 scrs_tib <- as_tibble(scrfl) |>
   mutate(Samp_Date = as.Date(Samp_Date))
-
-# # OLD code -> to convert dates to "Date" format
-# scrdtfrm <- data.frame(scrfl[,3],scrfl[,1],scrfl[,2])
-# scrdts <- as.Date(with(scrdtfrm,paste(scrfl[,3],scrfl[,1],scrfl[,2],sep="-")),format="%Y-%m-%d")
-# scrtbl <- cbind(scrdts,scrfl[,4:6])
 
 
 # ### Step 1: Create daily-resolution time structure
@@ -179,15 +173,6 @@ colsall <- c(colwm,colnu,colel,colla,colla,colcd,colcd,
             colel,colla,colcd,colnu,colnu,colwm,colel,
             colnu,colcd,colnu,colcd)
 
-# # Delineate for NH05 vs. NH25
-# if(yrsunq[1] == 1996){
-#   symspal = symsall
-#   colspal = colsall
-# } else if(yrsunq[1] == 1998){
-#   symspal = symsall[3:length(symsall)]
-#   colspal = colsall[3:length(colsall)]
-# }
-
 
 # PLOT 1 - NMDS1
 plt02_1 <- ggplot(data = model_gm1, aes(x = DOY, y = fit)) +  # For some reason, have to plot the GAM first...
@@ -263,58 +248,5 @@ plt02_2 <- ggplot(data = model_gm2, aes(x = DOY, y = fit)) +  # For some reason,
 # # Plot w/o legend
 # ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P2_nMDS2_YrlyCyc_noLgd.png", plot = plt02_2, width = 2000, height = 1200, units = 'px')
 
-
-
-
-
-
-
-
-  
-  
-################  OLD version -> Base R  ####################  
-  
-  
-# # S3.1: Create Jan. 1 timeseries and find indices of 'mstrdayall' that match
-# scrin <- readline(prompt = "Which nMDS dimension?")
-# 
-# jan1s <- seq(mstrdt[1],as.Date("2020-01-01"),by="year")
-# idxj1 <- which(mstrdayall$Samp_Date %in% jan1s)
-# idxend <- c(idxj1[2:length(idxj1)]-1,nrow(mstrdayall))
-# 
-# # S3.2: Get data.frame of year-long chunks for selected species
-# yrsunq <- unique(year(mstrdayall$Samp_Date))
-# dtswk <- format(mstrdayall$Samp_Date,"%m-%d")
-# wksunq <- unique(dtswk)
-# # Also get indices of Day 1 of each month -> for plotting purposes (below)
-# mostunq <- unique(floor_date(mstrdayall$Samp_Date[1:365], unit = "month"))
-# mostidx <- which(mstrdayall$Samp_Date %in% mostunq)
-# mostdt <- format(as.Date(mostunq),"%m-%d")
-# 
-# 
-# # For-loop to select each year-chunk
-# scrchnks <- data.frame(matrix(nrow=length(yrsunq),ncol=length(wksunq)))
-# for(jx in 1:length(idxj1)){
-#   chnk = t(mstrdayall[idxj1[jx]:idxend[jx],as.numeric(scrin)+1])
-#   scrchnks[jx,] = chnk
-# }
-# rownames(scrchnks) <- yrsunq
-# colnames(scrchnks) <- wksunq
-
-
-
-
-# # PLOT all yearly points
-# dev.new()
-# # plot(gam10,ylim=c(-1.2,1.2),xlab='',ylab='',xaxt='n',yaxt='n',bty='n',lwd=2,cex.axis = 1.7)
-# plot(seq(1,ncol(scrchnks),1),scrchnks[1,],pch=symspal[1],col=colspal[1],ylim=c(-1.5,1.5),xlab='',ylab='',xaxt='n',yaxt='n',bty='n',cex.axis = 1.7)
-# axis(1,labels=FALSE,tick=FALSE)
-# for(pu in 2:nrow(scrchnks)){
-#   points(seq(1,ncol(scrchnks),1),scrchnks[pu,],pch=symspal[pu],col=colspal[pu],cex=1)
-# }
-# lines(seq(1,ncol(scrchnks),1),rep(0,ncol(scrchnks)),col='grey50')
-# axis(1,at=mostidx,labels=mostdt,cex.axis=1.7,las=2)
-# axis(2,at=seq(-1,1,0.5),labels=c("-1","","0","","1"),cex.axis=1.7)
-# legend("topright",legend=c(as.character(yrsunq)),col=colspal,pch=symspal,ncol=6)
 
 

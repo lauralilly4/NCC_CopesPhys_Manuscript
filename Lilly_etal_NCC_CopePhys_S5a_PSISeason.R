@@ -13,7 +13,7 @@
 #   - Summer - 6 weeks post-BST
 
 # Must run prior: 
-#     - 'Lilly_etal_NCC_CopePhys_S3_SppProps.R'
+#     - 'Lilly_etal_NCC_CopePhys_S3a_SppProps.R'
 
 
 library(tidyverse)

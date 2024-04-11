@@ -3,7 +3,7 @@
 ##  Step 8a (formerly 6b), v2 - Get dates of Inst and Cumu ALF transitions
 ##  Plots for Fig. 8 (ALF (raw, cumu) vs. BST date & mag)
 ##  Laura E. Lilly
-##  Updated: 8 Apr 2024
+##  Updated: 10 Apr 2024
 ########################################
 
 
@@ -49,6 +49,15 @@ for(i in 2:ncol(inst_flw_yrly)){
   inst_neg1[1,i-1] <- dt1
 }
 colnames(inst_neg1) <- unique(inst_flw$Year)
+
+
+
+########## LEFT OFF HERE ###########
+# 1) Convert 'inst_neg1' dates to full dates (Y-m-d) to compare to BST dates...
+#     OR actually, convert both sets to yearday values
+# 2) Set up correlations for: 
+#     a) ALF neg yearday vs. BST yearday
+#     b) ALF neg yearday vs. Summer PSI
 
 
 

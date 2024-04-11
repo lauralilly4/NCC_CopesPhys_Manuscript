@@ -1,14 +1,16 @@
 ########################################
 ##  NOAA/OSU post-doc (NCC Copepods)
-##  Step 3: Calculate proportions of copepod spp. for each biweekly period
+##  Step 3a: Calculate proportions of copepod spp. for 
+#       each biweekly period
 ##  Laura E. Lilly
-##  Updated: 18 May 2023
+##  Updated: 10 Mar 2024
 ########################################
 # From raw values for each copepod spp. --> calculate proportions of spp
 #   for visual examination and subsequent analyses
-# NOTE: Proportions are based on *log-transformed* density values
-#   because otherwise 2-3 spp. completely dominate community
-# Do NOT need to run other scripts prior to this one
+# Proportions are based on *untransformed/back-transformed* 
+#   density values (from input log-trans file)
+
+# NOTE: Do NOT need to run other scripts prior to this one
 
 
 library(lubridate)
@@ -84,6 +86,7 @@ names(mstrdata) = names(copeallunq[2:ncol(copeallunq)])
 sppsums <- rowSums(mstrdata,na.rm=TRUE)
 propsmat <- mstrdata/sppsums
 propsmat[is.na(propsmat)] <- 0
+
 
 
 ### Step 3: Get yearlong cutout of props 

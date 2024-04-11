@@ -1,19 +1,14 @@
 #########################################
 ##  NOAA/OSU post-doc (NCC Copepods)
-##  Step 2b - Plots for Fig. 2 (Species climatologies)
+##  Step 2 - Species-level climatologies (Fig. 2)
 ##  Laura E. Lilly
-##  Updated: 1 Aug 2023
+##  Updated: 10 Mar 2024
 ########################################
 #   - Box plots (1996-2020)
 #   - Spp.-spp. correlations
 
 
 library(prettyGraphics)
-# Change WD to "R codes" folder
-# setwd('~/../../Documents/OSU_NOAA_Codes/R_codes')
-# setwd(getSrcDirectory(function(){})[1])
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-
 
 # ### Input copepod species file
 copefl = read.csv(paste0('NH05_CopeDens_log_subSpp_1996_2020.csv'))
@@ -75,19 +70,16 @@ sppdif = sppmax/sppmin
 
 
 
-
+######################################
 # # ### Step 2: Plot boxplots by month
-# dev.new()
-# boxres = boxplot(CTNCAL~Mon,yrmoavgs,main=paste(copespp))
 
 
-
-######### CORRELATIONS #########
+### CORRELATIONS
 crspp1 = meanfl[,8]
 crspp2 = meanfl[,9]
 cor.test(crspp1,crspp2,method="spearman")
 
-# Calculate CI values: hi and lo
+### Calculate CI values: hi and lo
 cilo = meanfl-cifl
 cihi = meanfl+cifl
 
@@ -125,21 +117,16 @@ for(pu in 3:5){
                        add_ci = list(col = scales::alpha(colcl[pu-1], 0.1), border = FALSE),
                        add_fit = list(col = colcl[pu-1], lwd = 1.8, lty = 5))
   }
-
-  # lines(meanfl$Month,meanfl[,pu],lwd=1.3,col=corrcols[pu-1])
   points(meanfl$Month,meanfl[,pu],pch=symcl[pu-1],col=colcl[pu-1],cex=1.5)
 }
 
 axis(side=1,at=seq(1,12,1),labels=seq(1,12,1),cex.axis=1.7,las=1)
 nmscl = c("Pseudocalanus spp","C. marshallae","A. longiremis","Cp. abdominalis")
-# legend("topleft",cex = 2,legend=nmscl,bty = "n",col=colcl,pch=symcl,ncol=2)
-
 
 
 
 # ## WARM spp only
 colwm = rep(c("red3","orangered","orange3","goldenrod"),3)
-# colwm = rep("grey35",10) # GREY-only option
 symwm = c(16,17,18,0,1,2,4,5,6,8)
 dev.new(width=8,height=20)
 par(mar=c(6.5,5,3,4))
@@ -169,7 +156,6 @@ for(pu in c(8:15,17)){
                      add_fit = list(col = colwm[pu-7], lwd = 1.5, lty = 5))
     points(meanfl$Month,meanfl[,pu],pch=symwm[pu-7],col=colwm[pu-7],cex=1.5)
   }
-  # lines(meanfl$Month,meanfl[,pu],lwd=1.3,col=corrcols[pu-1])
 
 }
 
@@ -177,6 +163,4 @@ axis(side=1,at=seq(1,12,1),labels=seq(1,12,1),cex.axis=1.7,las=1)
 nmswm = c("A. tonsa","C. pacificus","Co. styliremis","Co. tenuis","Clasocalanus spp.",
           "Corycaeus anglicus","Ct. vanus","Mc. tenuicornis","Paracalanus spp",
           "Cl. arcuicornis")
-# legend("topleft",legend=nmswm,bty = "n",cex = 2,col=colwm,pch=symwm,ncol=3)
-
 

@@ -1,8 +1,8 @@
 ########################################
 ##  NOAA/OSU post-doc (NCC Copepods)
-##  Step 1: Run nMDS of copepod spp.
+##  Step 1a: Run nMDS of copepod spp.
 ##  Laura E. Lilly
-##  Updated: 18 May 2023
+##  Updated: 10 Mar 2024
 ########################################
 # Data are from Newport Hydro Line (NHL):
 #   - *Year-day dates*
@@ -105,6 +105,7 @@ sampnmds3df <- as.data.frame(scores(spp_nmds3))
 
 ###################################################
 # ### Step 4: Plot nMDS ordinations and save scores
+
 
 # ### Dim:  k = 2
 # Plot 4a: Stress plot

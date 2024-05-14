@@ -220,7 +220,7 @@ win_psi_srt <- win_psi_mlt |>
 
 
 plt05_1 <- ggplot(data = win_psi_srt, aes(x = Year, y = PSI)) +  # For some reason, have to plot the GAM first...
-  geom_point(aes(x = Year, y = PSI, color = factor(Comp_yr), shape = factor(Comp_yr))) + 
+  geom_point(aes(x = Year, y = PSI, color = factor(Comp_yr), shape = factor(Comp_yr)), size = 2) + 
   
   ylim(c(0,100)) +
   scale_color_manual(name = 'Year',
@@ -237,19 +237,36 @@ plt05_1 <- ggplot(data = win_psi_srt, aes(x = Year, y = PSI)) +  # For some reas
                                 "2012","","","",
                                 "2016","","","","2020")) +
 
-  theme(axis.text = element_text(colour = "black", size = 12),
-        # axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
-        legend.text = element_text(size = 12, colour ="black"),
-        legend.position = "bottom", 
-        axis.title = element_text(size = 14, colour = "black"),
-        legend.title = element_text(size = 14, colour = "black"),
+  # theme(axis.text = element_text(colour = "black", size = 12),
+  #       # axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+  #       legend.text = element_text(size = 12, colour ="black"),
+  #       legend.position = "bottom", 
+  #       axis.title = element_text(size = 14, colour = "black"),
+  #       legend.title = element_text(size = 14, colour = "black"),
+  #       panel.background = element_blank(), 
+  #       panel.border = element_rect(colour = "grey50", fill = NA, size = 0.4),
+  #       legend.key=element_blank()) +
+  
+  theme(# axis.title = element_text(size = 14, colour = "black"),
+        axis.text = element_text(size = 16, colour = "black"),
+        legend.title = element_text(size = 20, colour = "black"),
+        legend.text = element_text(size = 18, colour ="black"),
+        legend.position = "none",
+        # legend.position = "bottom",
+        legend.key = element_blank(),
         panel.background = element_blank(), 
-        panel.border = element_rect(colour = "grey50", fill = NA, size = 0.4),
-        legend.key=element_blank()) +
-  guides(color = guide_legend(ncol = 7),
-         shape = guide_legend(ncol = 7))
-
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P5_1_Win_PSI.png", plot = plt05_1, width = 2000, height = 1600, units = 'px')
+        # panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black")) +
+  
+  guides(color = guide_legend(ncol = 4),
+         shape = guide_legend(ncol = 4))
+# # Plot w/ legend
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5_1_Win_PSI.png", plot = plt05_1, width = 2000, height = 1600, units = 'px')
+# # Plot w/o legend
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5_1_Win_PSI_noLgd.png", plot = plt05_1, width = 2000, height = 1200, units = 'px')
 
 
 
@@ -264,7 +281,7 @@ bst_psi_srt <- bst_psi_mlt |>
 
 
 plt05_2 <- ggplot(data = bst_psi_srt, aes(x = Year, y = PSI)) +  # For some reason, have to plot the GAM first...
-  geom_point(aes(x = Year, y = PSI, color = factor(Comp_yr), shape = factor(Comp_yr))) + 
+  geom_point(aes(x = Year, y = PSI, color = factor(Comp_yr), shape = factor(Comp_yr)), size = 2) + 
   
   ylim(c(0,100)) +
   scale_color_manual(name = 'Year',
@@ -280,19 +297,24 @@ plt05_2 <- ggplot(data = bst_psi_srt, aes(x = Year, y = PSI)) +  # For some reas
                                 "2008","","","",
                                 "2012","","","",
                                 "2016","","","","2020")) +
-  
-  theme(axis.text = element_text(colour = "black", size = 12),
-        legend.text = element_text(size = 12, colour ="black"),
-        legend.position = "bottom", 
-        axis.title = element_text(size = 14, colour = "black"),
+
+  theme(axis.title = element_text(size = 14, colour = "black"),
+        axis.text = element_text(size = 16, colour = "black"),
         legend.title = element_text(size = 14, colour = "black"),
+        legend.text = element_text(size = 12, colour ="black"),
+        legend.position = "none",
+        # legend.position = "bottom",
+        legend.key = element_blank(),
         panel.background = element_blank(), 
-        panel.border = element_rect(colour = "grey50", fill = NA, size = 0.4),
-        legend.key=element_blank()) +
+        # panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black")) +
   guides(color = guide_legend(ncol = 7),
          shape = guide_legend(ncol = 7))
 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P5_2_BST_PSI.png", plot = plt05_2, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5_2_BST_PSI.png", plot = plt05_2, width = 2000, height = 1200, units = 'px')
 
 
 
@@ -307,7 +329,7 @@ sum_psi_srt <- sum_psi_mlt |>
 
 
 plt05_3 <- ggplot(data = sum_psi_srt, aes(x = Year, y = PSI)) +  # For some reason, have to plot the GAM first...
-  geom_point(aes(x = Year, y = PSI, color = factor(Comp_yr), shape = factor(Comp_yr))) + 
+  geom_point(aes(x = Year, y = PSI, color = factor(Comp_yr), shape = factor(Comp_yr)), size = 2) + 
   
   ylim(c(0,100)) +
   scale_color_manual(name = 'Year',
@@ -324,17 +346,22 @@ plt05_3 <- ggplot(data = sum_psi_srt, aes(x = Year, y = PSI)) +  # For some reas
                                 "2012","","","",
                                 "2016","","","","2020")) +
   
-  theme(axis.text = element_text(colour = "black", size = 12),
-        legend.text = element_text(size = 12, colour ="black"),
-        legend.position = "bottom", 
-        axis.title = element_text(size = 14, colour = "black"),
+    theme(axis.title = element_text(size = 14, colour = "black"),
+        axis.text = element_text(size = 16, colour = "black"),
         legend.title = element_text(size = 14, colour = "black"),
+        legend.text = element_text(size = 12, colour ="black"),
+        legend.position = "none",
+        # legend.position = "bottom",
+        legend.key = element_blank(),
         panel.background = element_blank(), 
-        panel.border = element_rect(colour = "grey50", fill = NA, size = 0.4),
-        legend.key=element_blank()) +
+        # panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black")) +
   guides(color = guide_legend(ncol = 7),
          shape = guide_legend(ncol = 7))
 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P5_3_Sum_8wks_PSI.png", plot = plt05_3, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5_3_Sum_8wks_PSI.png", plot = plt05_3, width = 2000, height = 1200, units = 'px')
 
 

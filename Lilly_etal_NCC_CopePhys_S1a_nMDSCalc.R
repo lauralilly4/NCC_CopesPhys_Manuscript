@@ -134,7 +134,7 @@ plt1a <- ggplot(sppnmds2df, aes(x = MDS1, y = MDS2)) +
         panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
         legend.key=element_blank())
 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P1_nMDS_Ord_k2.png", plot = plt1a, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P1_nMDS_Ord_k2.png", plot = plt1a, width = 2000, height = 1600, units = 'px')
 
 
 # # Save nMDS scores -> by Species
@@ -148,7 +148,7 @@ plt1a <- ggplot(sppnmds2df, aes(x = MDS1, y = MDS2)) +
 
 # ### Dim:  k = 3
 # Plot 5a: Stress plot
-# png("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P0_nMDS_StressPlot_k3.png", width = 1000, height = 800, units = 'px')
+# png("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P0_nMDS_StressPlot_k3.png", width = 1000, height = 800, units = 'px')
 # dev.new(width=8,height=20)
 stressplot(spp_nmds3)
 dev.off()
@@ -173,7 +173,7 @@ plt1b <- ggplot(sppnmds3df, aes(x = MDS1, y = MDS2)) +
         panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
         legend.key=element_blank())
 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P1_nMDS_Ord_k3.png", plot = plt1b, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P1_nMDS_Ord_k3.png", plot = plt1b, width = 2000, height = 1600, units = 'px')
 
 
 # # Save nMDS scores -> by Species

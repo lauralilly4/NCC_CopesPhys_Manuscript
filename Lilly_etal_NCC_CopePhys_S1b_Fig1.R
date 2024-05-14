@@ -12,6 +12,7 @@ library(tidyverse)
 library(lubridate)
 library(mgcv)
 library(tidygam)
+library(tidymv)
 
 
 # Open datafile
@@ -177,10 +178,10 @@ colsall <- c(colwm,colnu,colel,colla,colla,colcd,colcd,
 # PLOT 1 - NMDS1
 plt02_1 <- ggplot(data = model_gm1, aes(x = DOY, y = fit)) +  # For some reason, have to plot the GAM first...
   
+  geom_segment(aes(x = 1, xend = 365, y = 0, yend = 0), color = "grey30", lwd = 0.3) + 
   geom_smooth_ci(linetype = 'dashed', lwd = 1) +
-  
   geom_point(data = mstrdts_tib, aes(x = DOY, y = NMDS1, color = factor(pltyr), shape = factor(pltyr))) + 
-  
+
   ylim(c(-1.1,1.1)) +
   scale_color_manual(name = 'Year',
                      labels = yrsplt,
@@ -195,26 +196,32 @@ plt02_1 <- ggplot(data = model_gm1, aes(x = DOY, y = fit)) +  # For some reason,
                        pull(ndays),
                      labels = month.abb[c(1:12)]) +
   
-  theme(axis.text = element_text(colour = "black", size = 12),
-        legend.text = element_text(size = 12, colour ="black"),
-        legend.position = "bottom", 
-        axis.title = element_text(size = 14, colour = "black"),
+  theme(axis.title = element_text(size = 14, colour = "black"),
+        axis.text = element_text(colour = "black", size = 12),
         legend.title = element_text(size = 14, colour = "black"),
+        legend.text = element_text(size = 12, colour ="black"),
+        legend.position = "none", 
+        legend.key = element_blank(),
         panel.background = element_blank(), 
-        panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
-        legend.key=element_blank()) +
+        # panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black")) +
+  
   guides(color = guide_legend(ncol = 7),
          shape = guide_legend(ncol = 7))
-
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P2_nMDS1_YrlyCyc.png", plot = plt02_1, width = 2000, height = 1600, units = 'px')
-
+# # Plot w legend
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS1_YrlyCyc.png", plot = plt02_1, width = 2000, height = 1600, units = 'px')
+# # Plot w/o legend
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS1_YrlyCyc_noLgd.png", plot = plt02_1, width = 2000, height = 1200, units = 'px')
 
 
 # PLOT 2 - NMDS2
 plt02_2 <- ggplot(data = model_gm2, aes(x = DOY, y = fit)) +  # For some reason, have to plot the GAM first...
   
+  geom_segment(aes(x = 1, xend = 365, y = 0, yend = 0), color = "grey30", lwd = 0.3) + 
   geom_smooth_ci(linetype = 'dashed', lwd = 1) +
-  
   geom_point(data = mstrdts_tib, aes(x = DOY, y = NMDS2, color = factor(pltyr), shape = factor(pltyr))) + 
   
   ylim(c(-1.1,1.1)) +
@@ -231,22 +238,26 @@ plt02_2 <- ggplot(data = model_gm2, aes(x = DOY, y = fit)) +  # For some reason,
                        pull(ndays),
                      labels = month.abb[c(1:12)]) +
   
-  theme(axis.text = element_text(colour = "black", size = 12),
-        legend.text = element_text(size = 12, colour ="black"),
-        legend.position = "bottom", 
-        # legend.position = "none",
-        axis.title = element_text(size = 14, colour = "black"),
+  theme(axis.title = element_text(size = 14, colour = "black"),
+        axis.text = element_text(colour = "black", size = 12),
         legend.title = element_text(size = 14, colour = "black"),
+        legend.text = element_text(size = 12, colour ="black"),
+        # legend.position = "none",
+        legend.position = "bottom",
+        legend.key = element_blank(),
         panel.background = element_blank(), 
-        panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
-        legend.key=element_blank()) +
+        # panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black")) +
   guides(color = guide_legend(ncol = 7),
          shape = guide_legend(ncol = 7))
 
 # # Plot w/ legend
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P2_nMDS2_YrlyCyc.png", plot = plt02_2, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS2_YrlyCyc.png", plot = plt02_2, width = 2000, height = 1600, units = 'px')
 # # Plot w/o legend
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P2_nMDS2_YrlyCyc_noLgd.png", plot = plt02_2, width = 2000, height = 1200, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS2_YrlyCyc_noLgd.png", plot = plt02_2, width = 2000, height = 1200, units = 'px')
 
 
 

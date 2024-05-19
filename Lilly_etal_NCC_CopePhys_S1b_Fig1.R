@@ -104,46 +104,76 @@ pltx1a <- ggplot(mstrdayall, aes(x = Samp_Date, y = NMDS1)) +
   
   geom_point(aes(x = Samp_Date, y = NMDS1), size = 0.7, color = 'grey40') +
   # geom_line(aes(x = Samp_Date, y = NMDS1), lwd = 0.5, linetype = "dotted") +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "lm", se = FALSE) +
 
   annotate("text", label = "Adj. R^2 = 0.01", x = mstrdayall$Samp_Date[2000], 
            y = -0.8, size = 4, colour = "black") +
   annotate("text", label = "p < 0.01", x = mstrdayall$Samp_Date[2000], 
            y = -0.9, size = 4, colour = "black") +
+    
+  scale_x_continuous(breaks = seq.Date(as.Date(paste(min(year(mstrdayall$Samp_Date)),01,01,sep = "-")),
+                                       as.Date(paste(max(year(mstrdayall$Samp_Date)),01,01,sep = "-")),365),
+                     labels = c("1996","","","","2000","","","",
+                                "2004","","","","2008","","","",
+                                "2012","","","","2016","","","","2020"),
+                     limits = c(as.Date(paste(min(year(mstrdayall$Samp_Date)),01,01,sep = "-")),
+                                as.Date(paste(max(year(mstrdayall$Samp_Date)),12,31,sep = "-"))),
+                     name = "") +
+  scale_y_continuous(breaks = c(-1,-0.5,0,0.5,1),
+                     labels = c("-1","","0","","1"),
+                     limits = c(-1,1),
+                     name = "") + 
   
-  theme(axis.text = element_text(colour = "black", size = 12),
-        legend.text = element_text(size = 12, colour ="black"),
-        legend.position = "bottom", 
-        axis.title = element_text(size = 14, colour = "black"),
-        legend.title = element_text(size = 14, colour = "black"),
-        panel.background = element_blank(), 
-        panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
-        legend.key=element_blank()) 
+  theme(axis.title.y = element_text(size = 14, colour = "black"),
+        axis.text.y = element_text(size = 14, colour = "black"),
+        axis.title.x = element_text(size = 14, colour = "black"),
+        axis.text.x = element_text(size = 14, colour = "black", 
+                                   angle = 90, vjust = 0.5, hjust = 1),
+        panel.background = element_blank(),
+        axis.line.x = element_line(),
+        axis.line.y = element_line(linewidth = 0.5, linetype = "solid", colour = "black"),
+        )
 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/PX1_nMDS1_LoadsTimeser.png", plot = pltx1a, width = 2000, height = 1000, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/PX1_nMDS1_LoadsTimeser.png", plot = pltx1a, width = 2000, height = 1000, units = 'px')
+
+
 
   
 # 4.2: NMDS2
 pltx2a <- ggplot(mstrdayall, aes(x = Samp_Date, y = NMDS2)) +
   
   geom_point(aes(x = Samp_Date, y = NMDS2), size = 0.7, color = 'grey40') +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "lm", se = FALSE) +
 
   annotate("text", label = "Adj. R^2 = 0.03", x = mstrdayall$Samp_Date[8200], 
            y = 0.7, size = 4, colour = "black") +
   annotate("text", label = "p < 0.001", x = mstrdayall$Samp_Date[8200], 
            y = 0.6, size = 4, colour = "black") +
   
-  theme(axis.text = element_text(colour = "black", size = 12),
-        legend.text = element_text(size = 12, colour ="black"),
-        legend.position = "bottom", 
-        axis.title = element_text(size = 14, colour = "black"),
-        legend.title = element_text(size = 14, colour = "black"),
-        panel.background = element_blank(), 
-        panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
-        legend.key=element_blank()) 
+  scale_x_continuous(breaks = seq.Date(as.Date(paste(min(year(mstrdayall$Samp_Date)),01,01,sep = "-")),
+                                       as.Date(paste(max(year(mstrdayall$Samp_Date)),01,01,sep = "-")),365),
+                     labels = c("1996","","","","2000","","","",
+                                "2004","","","","2008","","","",
+                                "2012","","","","2016","","","","2020"),
+                     limits = c(as.Date(paste(min(year(mstrdayall$Samp_Date)),01,01,sep = "-")),
+                                as.Date(paste(max(year(mstrdayall$Samp_Date)),12,31,sep = "-"))),
+                     name = "") +
+  scale_y_continuous(breaks = c(-1,-0.5,0,0.5,1),
+                     labels = c("-1","","0","","1"),
+                     limits = c(-1,1),
+                     name = "") + 
+  
+  theme(axis.title.y = element_text(size = 14, colour = "black"),
+        axis.text.y = element_text(size = 14, colour = "black"),
+        axis.title.x = element_text(size = 14, colour = "black"),
+        axis.text.x = element_text(size = 14, colour = "black", 
+                                   angle = 90, vjust = 0.5, hjust = 1),
+        panel.background = element_blank(),
+        axis.line.x = element_line(),
+        axis.line.y = element_line(linewidth = 0.5, linetype = "solid", colour = "black"),
+  )
 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/PX1_nMDS2_LoadsTimeser.png", plot = pltx2a, width = 2000, height = 1000, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/PX1_nMDS2_LoadsTimeser.png", plot = pltx2a, width = 2000, height = 1000, units = 'px')
 
 
 

@@ -358,7 +358,9 @@ plt05_3 <- ggplot(data = sum_psi_srt, aes(x = Year, y = PSI)) +  # For some reas
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.line = element_line(colour = "black")) +
+        # axis.line = element_line(colour = "black"),
+        axis.line.x = element_line(colour = "black"),
+        axis.line.y = element_line(colour = "black")) +
   guides(color = guide_legend(ncol = 7),
          shape = guide_legend(ncol = 7))
 

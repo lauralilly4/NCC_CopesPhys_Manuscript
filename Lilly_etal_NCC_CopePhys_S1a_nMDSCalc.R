@@ -79,7 +79,7 @@ colnames(sppdtavg) <- sppnmslist
 
 # Run nMDS with two different dimensions applied: k = 2, k = 3
 spp_nmds2 <- metaMDS(sppdtavg,trymax=100,k=2) 
-spp_nmds3 <- metaMDS(sppdtavg,trymax=100,k=3) 
+# spp_nmds3 <- metaMDS(sppdtavg,trymax=100,k=3) 
 
 
 
@@ -92,14 +92,14 @@ sppnmds2df <- as.data.frame(scores(spp_nmds2$species)) |>
   mutate(Spp_col = sppnmscols)
 # Second, get nMDS scores by *Sample Date* (to save for Fig. 1, Fig. 3 on
 #   timeseries of community shifts, etc.)
-sampnmds2df <- as.data.frame(scores(spp_nmds2))
+sampnmds2df <- data.frame(scores(spp_nmds2$sites))
 
 
-# k = 3
-sppnmds3df <- as.data.frame(scores(spp_nmds3$species)) |>
-  mutate(Spp_col = sppnmscols)
-
-sampnmds3df <- as.data.frame(scores(spp_nmds3))
+# # k = 3
+# sppnmds3df <- as.data.frame(scores(spp_nmds3$species)) |>
+#   mutate(Spp_col = sppnmscols)
+# 
+# sampnmds3df <- as.data.frame(scores(spp_nmds3$sites))
 
 
 
@@ -110,7 +110,7 @@ sampnmds3df <- as.data.frame(scores(spp_nmds3))
 # ### Dim:  k = 2
 # Plot 4a: Stress plot
 # png("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P0_nMDS_StressPlot_k2.png", width = 1000, height = 800, units = 'px')
-# dev.new(width=8,height=20)
+dev.new(width=8,height=20)
 stressplot(spp_nmds2)
 dev.off()
 
@@ -118,12 +118,12 @@ dev.off()
 # Plot 4b: nMDS scores by species
 plt1a <- ggplot(sppnmds2df, aes(x = MDS1, y = MDS2)) + 
   geom_point(size = 2, aes(color = Spp_col)) + 
-  geom_text(aes(label = rownames(sppnmds2df), color = Spp_col), size = 3, nudge_y = 0.05) +
+  geom_text(aes(label = rownames(sppnmds2df), color = Spp_col), size = 3, nudge_y = 0.05, show.legend = FALSE) +
   
   labs(x = "NMDS1", colour = "Spp. group", y = "NMDS2", shape = "Type") + 
   
-  scale_colour_manual(values = c("grey30","purple3","orange2"),
-                      labels = c("Neutral","Cool","Warm")) +
+  scale_colour_manual(values = c("grey30","orange2","purple3"),
+                      labels = c("Neutral","Warm","Cool")) +
   
   theme(axis.text = element_text(colour = "black", size = 12),
         legend.text = element_text(size = 12, colour ="black"),
@@ -131,7 +131,7 @@ plt1a <- ggplot(sppnmds2df, aes(x = MDS1, y = MDS2)) +
         axis.title = element_text(size = 14, colour = "black"),
         legend.title = element_text(size = 14, colour = "black"),
         panel.background = element_blank(), 
-        panel.border = element_rect(colour = "black", fill = NA, size = 0.5),
+        panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
         legend.key=element_blank())
 
 # ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P1_nMDS_Ord_k2.png", plot = plt1a, width = 2000, height = 1600, units = 'px')
@@ -161,7 +161,7 @@ plt1b <- ggplot(sppnmds3df, aes(x = MDS1, y = MDS2)) +
   
   labs(x = "NMDS1", colour = "Spp. group", y = "NMDS2", shape = "Type") + 
   
-  scale_colour_manual(values = c("grey30","purple3","orange2"),
+  scale_colour_manual(values = c("grey30","orange2","purple3"),
                       labels = c("Neutral","Cool","Warm")) +
   
   theme(axis.text = element_text(colour = "black", size = 12),

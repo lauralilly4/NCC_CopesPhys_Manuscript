@@ -8,7 +8,7 @@
 
 
 %% ======= Step 1: Load files and assign variables =======
-wndflwfl = load('BTC_Wind_Indices_v2_wVel_45N.mat');
+wndflwfl = load('Phys_files_2024/Wind_Indices_Vel_45N_V2_1JanCumFlow.mat');
 
 
 % %% Assign variables

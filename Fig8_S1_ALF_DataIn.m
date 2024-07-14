@@ -9,7 +9,8 @@
 
 
 %% ======= Load velocity file & assign variables =======  
-loadfile = 'Phys_Inds/BTC_ADCP_NH10_1997_2021_V6.mat';
+% loadfile = 'Phys_Inds/BTC_ADCP_NH10_1997_2021_V6.mat';
+loadfile = 'Phys_files_2024/ADCP_NH10_Rotated_1997_2024_V5.mat';
 load(loadfile)
 clear sal temp
 

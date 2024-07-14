@@ -14,7 +14,8 @@ copefl = read.csv(paste0('NH05_CopeDens_log_subSpp_1996_2020.csv'))
 
 
 # Select species
-copespp = readline("Which species? [PSEUDO,CALMAR,ACALON,CENABD,OITSIM,CTNCAL,PARA,CLAARC,CALPAC,METR,ACATON]  ")
+# PSEUDO,CALMAR,ACALON,CENABD,ACATON,CALPAC,CALSTY,CALTEN,CLASO,CORANG,CTNCAL,CALTENU,PARA,CLAARC
+copespp = readline("Which species?   ")
 sppcut = copefl[,copespp]
 
 sppdts_df = data.frame(copefl$Mon,copefl$Day,copefl$Year)

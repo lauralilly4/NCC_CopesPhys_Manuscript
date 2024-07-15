@@ -100,12 +100,12 @@ yrlbls <- year(bstdts)
 # Combine vectors into DF -> for plotting
 # First, get avg Summer PSI
 sum_avg_psi = colMeans(sum_psi)
-# REMOVE from *flow* datasets: 2015, 2016, 2021
-instyrdy2 <- instyrdy[-c(19,20,25)]
-instyrs2 <- as.numeric(colnames(inst_neg1))[-c(19,20,25)]
-# REMOVE from *copepod* datasets: 1996 - because flow doesn't have that year
-bstyrdy2 <- bstyrdy[-c(1)]
-sum_avg_psi2 <- sum_avg_psi[-c(1)]
+# REMOVE from *flow* datasets: 1997, 2015, 2016, 2021-24
+instyrdy2 <- instyrdy[-c(1,19,20,25:27)]
+instyrs2 <- as.numeric(colnames(inst_neg1))[-c(1,19,20,25:27)]
+# REMOVE from *copepod* datasets: 1996,1997  - because flow doesn't have that year
+bstyrdy2 <- bstyrdy[-c(1:2)]
+sum_avg_psi2 <- sum_avg_psi[-c(1:2)]
 
 inst_comps_df <- data.frame(cbind(instyrs2,instyrdy2,bstyrdy2,sum_avg_psi2))
 
@@ -168,7 +168,7 @@ plt11 <- ggplot(data = inst_comps_df,
   geom_smooth(method = 'lm', fill = NA) + 
   geom_text_repel(aes(label = instyrs2)) + 
   
-  xlab("Instantaneous Flow (m/s)") +
+  xlab("Yearday - Instantaneous Flow Transition") +
   ylab("BST Yearday") + 
   scale_color_manual(name = 'Year',
                      labels = instyrs2,
@@ -197,7 +197,7 @@ plt12 <- ggplot(data = inst_comps_df,
   geom_smooth(method = 'lm', fill = NA) + 
   geom_text_repel(aes(label = instyrs2)) + 
   
-  xlab("Instantaneous Flow (m/s)") +
+  xlab("Yearday - Instantaneous Flow Transition") +
   ylab("Summer avg. PSI") + 
   scale_color_manual(name = 'Year',
                      labels = instyrs2,

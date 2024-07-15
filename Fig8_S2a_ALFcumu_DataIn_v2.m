@@ -19,6 +19,7 @@ flwdt = datetime(flwtm,'ConvertFrom','datenum');
 flwyrs = unique(flwdt.Year);
 flwyrsall = flwyrs(1):1:flwyrs(end); % Create a sequence of ALL years encapsulated by the timeseries (because three years 
                                      % DNE in the timeseries above)
+flw_df = timetable(flwdt,flwcumu);
 
 % Winds (NEWPORT)
 wndyr = wndflwfl.years';

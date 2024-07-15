@@ -103,18 +103,18 @@ instflw_dy = retime(instflw_hr, 'daily', @(x) mean(x, 'omitnan'));
 
 
 
-% %%% Addendum #2: Table of 'along_mag' and 'date' -> to ID beginning of
-% sustained southward flow
-dts_mag_tbl = table(ref_dts',along_mean);
-
-filt_tim = time(ind)-ref_year;
-filt_dts = datetime(filt_tim(1,:),'ConvertFrom','datenum');
-magfilt = along_2wfilt(ind);
-dtname = input('Which Mon-Dy?   [mm,dd]  ');
-dtst = datetime(yrin,dtname(1),dtname(2),0,0,0);
-
-dtid = datefind(dtst,filt_dts);
-
-mag_filt_tbl = table(filt_dts(dtid:end)',magfilt(dtid:end));
-
-mag_filt_tbl(1:1000,:)
+% % %%% Addendum #2: Table of 'along_mag' and 'date' -> to ID beginning of
+% % sustained southward flow
+% dts_mag_tbl = table(ref_dts',along_mean);
+% 
+% filt_tim = time(ind)-ref_year;
+% filt_dts = datetime(filt_tim(1,:),'ConvertFrom','datenum');
+% magfilt = along_2wfilt(ind);
+% dtname = input('Which Mon-Dy?   [mm,dd]  ');
+% dtst = datetime(yrin,dtname(1),dtname(2),0,0,0);
+% 
+% dtid = datefind(dtst,filt_dts);
+% 
+% mag_filt_tbl = table(filt_dts(dtid:end)',magfilt(dtid:end));
+% 
+% mag_filt_tbl(1:1000,:)

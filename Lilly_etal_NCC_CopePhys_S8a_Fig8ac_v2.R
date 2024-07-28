@@ -1,9 +1,9 @@
 ########################################
 ##  NOAA/OSU post-doc (NCC Copepods)
 ##  Step 8a (formerly 6b), v2 - Get dates of Inst and Cumu ALF transitions
-##  Plots for Fig. 8 (ALF (raw, cumu) vs. BST date & mag)
+##  Plots for Fig. 8a,c - INSTANTANEOUS ALF vs. BST date & mag
 ##  Laura E. Lilly
-##  Updated: 10 Apr 2024
+##  Updated: 20 Jul 2024
 ########################################
 # RUN AFTER: 
 #   - 'Lilly_etal_NCC_CopePhys_S3a_SppProps.R'
@@ -41,10 +41,12 @@ inst_flw <- flws_data |>
          ) |>
   select(dt_mody,Year,Inst_flow)
 
+
+# Second, get date of first negative value for each year
+# Pivot DF to group values by year -> to select one value from each year
 inst_flw_yrly <- inst_flw |>
   pivot_wider(names_from = Year, values_from = Inst_flow)
 
-# Second, get date of first negative value for each year
 inst_neg1 <- data.frame(matrix(nrow = 1, ncol = ncol(inst_flw_yrly)-1))
 
 for(i in 2:ncol(inst_flw_yrly)){
@@ -111,19 +113,6 @@ inst_comps_df <- data.frame(cbind(instyrs2,instyrdy2,bstyrdy2,sum_avg_psi2))
 
 
 
-
-#############################
-# ### DF #2: Cumulative flow
-cumu_flw <- flws_data |>
-  mutate(dt_mody = format(Date, format = "%m-%d")) |>
-  select(dt_mody,Year,Cumu_flow)
-
-
-# ### NEED: *Full* file of cumulative flow -> to get first negative slopes
-
-
-
-
 ########## Plots ##########
 symc <- c(15,16,17,18,12,3,4,8)
 colel <- "orangered"
@@ -142,13 +131,13 @@ colnu <- "grey50"
 #              symc[2],symc[4],symc[5],symc[4],symc[5],
 #              # 2017, 2018,   2019,   2020
 #              symc[6],symc[6],symc[7],symc[7])
-colsall <- c(colnu,colel,colla,colla,colcd,colcd,
+colsall <- c(colel,colla,colla,colcd,colcd,
              colwm,colnu,colwm,colcd,colnu,colla,colcd,
              colel,colla,colcd,colnu,colnu,
              colnu,colcd,colnu,colcd)
 
 
-# ### Plot 1: Instantaneous flow - year-chunks
+# ### Plot 10: Instantaneous flow - year-chunks
 plt10 <- ggplot(data = inst_flw, aes(x = dt_mody, y = Inst_flow)) + 
   
   geom_line(aes(color = factor(Year), group = Year)) + 
@@ -161,12 +150,16 @@ plt10 <- ggplot(data = inst_flw, aes(x = dt_mody, y = Inst_flow)) +
 
 
 # ### Correlation: Inst_flow_neg Yrdy vs. BST Yrdy
+lm11 <- lm(bstyrdy2 ~ instyrdy2, data = inst_comps_df)
+summary(lm11)
+
 plt11 <- ggplot(data = inst_comps_df,
                 aes(x = instyrdy2, y = bstyrdy2)) + 
-  
   geom_point(aes(x = instyrdy2, y = bstyrdy2, color = factor(instyrs2)), size = 3) + 
   geom_smooth(method = 'lm', fill = NA) + 
   geom_text_repel(aes(label = instyrs2)) + 
+  annotate('text', x = 175, y = 210, label = "R adj. = 0.92") + 
+  annotate('text', x = 175, y = 200, label = "p > 0.10") + 
   
   xlab("Yearday - Instantaneous Flow Transition") +
   ylab("BST Yearday") + 
@@ -185,17 +178,21 @@ plt11 <- ggplot(data = inst_comps_df,
         # legend.key=element_blank()
         ) 
 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P8a_InstFlw_v_BST.png", plot = plt11, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8a_InstFlw_v_BST_v2.png", plot = plt11, width = 2000, height = 1600, units = 'px')
 
 
 
 # ### Correlation: Inst_flow_neg Yrdy vs. Summer PSI
+lm12 <- lm(sum_avg_psi2 ~ instyrdy2, data = inst_comps_df)
+summary(lm12)
+
 plt12 <- ggplot(data = inst_comps_df,
                 aes(x = instyrdy2, y = sum_avg_psi2)) + 
-  
   geom_point(aes(x = instyrdy2, y = sum_avg_psi2, color = factor(instyrs2)), size = 3) + 
   geom_smooth(method = 'lm', fill = NA) + 
   geom_text_repel(aes(label = instyrs2)) + 
+  annotate('text', x = 174, y = 55, label = "R adj. = 0.13") + 
+  annotate('text', x = 174, y = 52, label = "p < 0.10") + 
   
   xlab("Yearday - Instantaneous Flow Transition") +
   ylab("Summer avg. PSI") + 
@@ -214,7 +211,7 @@ plt12 <- ggplot(data = inst_comps_df,
         # legend.key=element_blank()
   ) 
 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Plots_v4/P8b_InstFlw_v_SumPSI.png", plot = plt12, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8c_InstFlw_v_SumPSI.png", plot = plt12, width = 2000, height = 1600, units = 'px')
 
 
 

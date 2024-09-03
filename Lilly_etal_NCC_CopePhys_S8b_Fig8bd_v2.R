@@ -88,7 +88,7 @@ for(o in 2:ncol(cumu_flw_yr)){
   }
   cumu_slopes_yr[,o] <- slopesyr
 }
-cumu_slopes_yr[,1] <- cumu_flw_yr[366-353+1:353,1]
+cumu_slopes_yr[,1] <- cumu_flw_yr[slopedys:366,1]
 colnames(cumu_slopes_yr) <- colnames(cumu_flw_yr)
 
 
@@ -119,6 +119,7 @@ cumu_comps_df <- data.frame(cbind(cumu_sub$Year,cumu_sub$min,
 colnames(cumu_comps_df) <- c("Year","Cumu_DOY","PSI_DOY","BST_DOY")
 
 
+
 ########## Plots ##########
 symc <- c(15,16,17,18,12,3,4,8)
 colel <- "orangered"
@@ -144,7 +145,9 @@ colsall <- c(colel,colla,colla,colcd,colcd,
 
 
 # ### Plot 20: Cumulative flow - year-chunks
-plt20 <- ggplot(data = cumu_flw, aes(x = DOY, y = Cumu_flow)) + 
+plt20 <- ggplot(data = cumu_flw |>
+                  filter(Year == 1999), 
+                aes(x = DOY, y = Cumu_flow)) + 
   
   geom_line(aes(color = factor(Year), group = Year)) + 
   geom_segment(aes(x = DOY[1], xend = DOY[length(DOY)],
@@ -160,7 +163,10 @@ plt20 <- ggplot(data = cumu_flw, aes(x = DOY, y = Cumu_flow)) +
 cumu_slopes_long <- cumu_slopes_yr |>
   pivot_longer(!DOY, names_to = "Year", values_to = "Slope")
 
-plt21 <- ggplot(data = cumu_slopes_long, aes(x = DOY, y = Slope)) + 
+plt21 <- ggplot(data = cumu_slopes_long # |>
+                  # filter(Year == 1999)
+                , 
+                aes(x = DOY, y = Slope)) + 
   geom_line(aes(color = factor(Year), group = Year)) 
 
 
@@ -194,10 +200,10 @@ plt22 <- ggplot(data = cumu_comps_df,
         axis.title = element_text(size = 14, colour = "black"),
         # legend.title = element_text(size = 14, colour = "black"),
         panel.background = element_blank(), 
-        panel.border = element_rect(colour = "grey50", fill = NA, size = 0.4),
+        panel.border = element_rect(colour = "grey50", fill = NA, linewidth = 0.4),
         # legend.key=element_blank()
   ) 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8b_cumuFlw_v_BST.png", plot = plt22, width = 2000, height = 1600, units = 'px')
+# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8b_cumuFlw_v_BST_",slopedys,".png"), plot = plt22, width = 2000, height = 1600, units = 'px')
 
 
 
@@ -210,7 +216,7 @@ plt23 <- ggplot(data = cumu_comps_df,
   geom_point(aes(x = Cumu_DOY, y = PSI_DOY, color = factor(Year)), size = 3) + 
   geom_smooth(method = 'lm', fill = NA) + 
   geom_text_repel(aes(label = Year)) + 
-  annotate('text', x = 174, y = 55, label = "R adj. = -0.07") + 
+  annotate('text', x = 174, y = 55, label = "R adj. = 0.14") + 
   annotate('text', x = 174, y = 52, label = "p > 0.10") + 
   
   xlab("Yearday - negative Cumulative Flow") +
@@ -229,7 +235,7 @@ plt23 <- ggplot(data = cumu_comps_df,
         panel.border = element_rect(colour = "grey50", fill = NA, size = 0.4),
         # legend.key=element_blank()
   ) 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8d_CumuFlw_v_SumPSI.png", plot = plt23, width = 2000, height = 1600, units = 'px')
+# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8d_CumuFlw_v_SumPSI_",slopedys,".png"), plot = plt23, width = 2000, height = 1600, units = 'px')
 
 
 

@@ -13,7 +13,9 @@
 instfl = 'Phys_files_2024/ADCP_NH10_Rotated_1997_2024_V5.mat';
 load(instfl)
 along_inst = nanmean(along,1);
+acrs_inst = nanmean(across,1);
 time_inst = time;
+dt_inst = datetime(time,'ConvertFrom','datenum');
 
 % %%% Cumulative flow file
 cumufl = load('Phys_files_2024/Wind_Indices_Vel_45N_V2_1JanCumFlow.mat');
@@ -26,6 +28,10 @@ time_cumu = cumufl.time_vel;
 timeinst_dt = datetime(time_inst','ConvertFrom','datenum'); 
 flwinst_hr = timetable(timeinst_dt,along_inst');
 flwinst_dy = retime(flwinst_hr, 'daily', @(x) mean(x, 'omitnan'));
+
+acrsinst_hr = timetable(timeinst_dt,acrs_inst');
+acrsinst_dy = retime(acrsinst_hr, 'daily', @(x) mean(x, 'omitnan'));
+
 
 % Next, make timetable for cumulative flow
 timecumu_dt = datetime(time_cumu,'ConvertFrom','datenum');
@@ -49,5 +55,14 @@ flwsall_df = table(timeall',install',cumuall');
 flwsall_df.Properties.VariableNames = {'Date' 'Inst_flow' 'Cumu_flow'};
 
 writetable(flwsall_df,'NH10_Flows_Inst_Cumu.csv');
+
+% %%% ALSO write table of Along and Across flows -> for GAMs
+inst_df = table(flwinst_dy.timeinst_dt,flwinst_dy.Var1,acrsinst_dy.Var1);
+inst_df.Properties.VariableNames{1} = 'Date';
+inst_df.Properties.VariableNames{2} = 'Along_flow_inst';
+inst_df.Properties.VariableNames{3} = 'Across_flow_inst';
+
+writetable(inst_df,'NH10_AlongAcrossFlows_daily.csv');
+
 
 

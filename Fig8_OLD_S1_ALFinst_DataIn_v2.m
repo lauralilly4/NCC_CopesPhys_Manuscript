@@ -8,6 +8,9 @@
 % transition date of 'Raw' ALF 
 
 
+%%%%%%%%%% OLD %%%%%%%% Still includes rotation step for already-rotated
+%%%%%%%%%% data
+
 %% ======= Load velocity file & assign variables =======  
 loadfile = 'Phys_files_2024/ADCP_NH10_Rotated_1997_2024_V5.mat';
 load(loadfile)

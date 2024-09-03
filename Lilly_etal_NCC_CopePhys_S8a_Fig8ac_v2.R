@@ -158,7 +158,7 @@ plt11 <- ggplot(data = inst_comps_df,
   geom_point(aes(x = instyrdy2, y = bstyrdy2, color = factor(instyrs2)), size = 3) + 
   geom_smooth(method = 'lm', fill = NA) + 
   geom_text_repel(aes(label = instyrs2)) + 
-  annotate('text', x = 175, y = 210, label = "R adj. = 0.92") + 
+  annotate('text', x = 175, y = 210, label = "R adj. = -0.06") + 
   annotate('text', x = 175, y = 200, label = "p > 0.10") + 
   
   xlab("Yearday - Instantaneous Flow Transition") +
@@ -192,7 +192,7 @@ plt12 <- ggplot(data = inst_comps_df,
   geom_smooth(method = 'lm', fill = NA) + 
   geom_text_repel(aes(label = instyrs2)) + 
   annotate('text', x = 174, y = 55, label = "R adj. = 0.13") + 
-  annotate('text', x = 174, y = 52, label = "p < 0.10") + 
+  annotate('text', x = 174, y = 52, label = "p > 0.05") + 
   
   xlab("Yearday - Instantaneous Flow Transition") +
   ylab("Summer avg. PSI") + 

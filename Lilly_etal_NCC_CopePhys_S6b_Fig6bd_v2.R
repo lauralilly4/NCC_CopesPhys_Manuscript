@@ -12,6 +12,10 @@
 
 # NOTE: Flow data start in 1997, NOT 1996 (copepod data start year)
 
+# ### RUN AFTER: 'Lilly_etal_NCC_CopePhys_S5b_Fig5.R' -> to get nMDS scores 
+#     selected for summer dates
+
+
 library(tidyverse)
 library(lubridate)
 library(reshape2)
@@ -60,13 +64,10 @@ slopedys <- 14
 cumu_slopes_yr <- data.frame(matrix(nrow = nrow(cumu_flw_yr)-(slopedys-1),
                                     ncol = ncol(cumu_flw_yr)))
 
-
-######## LEFT OFF HERE: Make the 'Coef' function work for all-NA windows...
- 
 # Version 1 - returns the first error about can't run lm with NA, blah blah
 # Coef <- function(Z) if (all(is.na(df$y))) NA else coef(lm(x ~ y, as.data.frame(Z))) 
 Coef <- function(Z) ifelse (!all(is.na(df$y)), coef(lm(x ~ y, as.data.frame(Z), na.action = na.exclude)), NA) 
-
+# ... somehow I figured it out....
 
 # # Test code with just a subset of data
 # coef_sub <- df[251:(251+14),]
@@ -102,21 +103,43 @@ cumu_slopesmin <- cumu_slopes_long |>
   summarise(min = which.max(Slope < 0))
 
 
-# Combine vectors into DF -> for plotting
-# First, get avg Summer PSI
-sum_avg_psi = colMeans(sum_psi)
-# REMOVE from copepod-oriented datasets: 1996:1998,2004:2016 (because cumu_flow doesn't have
-#     values for the first dates, and BST doesn't have dates for 2015, 2016)
-sumpsi_sub <- sum_avg_psi[-c(1:3,9:19,23)]
-bst_sub <- bst_doy[-c(1:3,9:19,23)]
 
-# Remove 2015, 2016 from cumu_flow (because no BST dates)
+
+
+# ### OLD -> method with PSIs ( not nMDS)
+# # Combine vectors into DF -> for plotting
+# # First, get avg Summer PSI
+# sum_avg_psi = colMeans(sum_psi)
+# # REMOVE from copepod-oriented datasets: 1996:1998,2004:2016 (because cumu_flow doesn't have
+# #     values for the first dates, and BST doesn't have dates for 2015, 2016)
+# sumpsi_sub <- sum_avg_psi[-c(1:3,9:19,23)]
+# bst_sub <- bst_doy[-c(1:3,9:19,23)]
+# 
+# # Remove 2015, 2016 from cumu_flow (because no BST dates)
+# cumu_sub <- cumu_slopesmin |>
+#   filter(!(Year %in% c(2015,2016)))
+# cumu_comps_df <- data.frame(cbind(cumu_sub$Year,cumu_sub$min,
+#                                   sumpsi_sub,bst_sub))
+# colnames(cumu_comps_df) <- c("Year","Cumu_DOY","PSI_DOY","BST_DOY")
+
+
+
+# Combine Cumulative flow, BST date, and nMDS1 score
+# REMOVE from Flow datasets: 2015, 2016
 cumu_sub <- cumu_slopesmin |>
   filter(!(Year %in% c(2015,2016)))
 
+# REMOVE from BST and nMDS datasets: 1996:1998, 2004:2016, 2020
+bst_sub <- bst_doy[-c(1:3,9:19,23)]
+sum_nmds2 <- sum_merge[-c(1:3,9:19,23),]
+
+# Now combine all of the above vectors
 cumu_comps_df <- data.frame(cbind(cumu_sub$Year,cumu_sub$min,
-                                  sumpsi_sub,bst_sub))
-colnames(cumu_comps_df) <- c("Year","Cumu_DOY","PSI_DOY","BST_DOY")
+                                  sum_nmds2,bst_sub)) |>
+  select(Year,BST_Date,cumu_sub.min,BST_DOY,Date_SumMDS,NMDS1,NMDS2)
+colnames(cumu_comps_df)[3] <- "Cumu_DOY"
+
+
 
 
 
@@ -128,20 +151,13 @@ colcd <- "skyblue"
 colla <- "royalblue"
 colnu <- "grey50"
 
-# Set up color/symbol scheme based on year-classification (El Nino, La Nina
-#           warm, cool, neutral)
-# #            1997,   1998,   1999,   2000,   2001,   2002,  
-# symsall <- c(symc[1],symc[1],symc[1],symc[2],symc[1],symc[2],
-#              # 2003, 2004,   2005,   2006,   2007,   2008,   2009,
-#              symc[2],symc[2],symc[3],symc[3],symc[3],symc[3],symc[4],
-#              # 2010, 2011,   2012,   2013,   2014,    
-#              symc[2],symc[4],symc[5],symc[4],symc[5],
-#              # 2017, 2018,   2019,   2020
-#              symc[6],symc[6],symc[7],symc[7])
 colsall <- c(colel,colla,colla,colcd,colcd,
              colwm,colnu,colwm,colcd,colnu,colla,colcd,
              colel,colla,colcd,colnu,colnu,
              colnu,colcd,colnu,colcd)
+
+cols2 <- c(colla,colla,colcd,colcd,
+             colwm,colnu,colcd,colnu)
 
 
 # ### Plot 20: Cumulative flow - year-chunks
@@ -207,20 +223,20 @@ plt22 <- ggplot(data = cumu_comps_df,
 
 
 
-# ### Correlation: Cumu_flow_neg Yrdy vs. Summer PSI
-lm23 <- lm(PSI_DOY ~ Cumu_DOY, data = cumu_comps_df)
+# ### Correlation: Cumu_flow_neg Yrdy vs. Summer nMDS1
+lm23 <- lm(NMDS1 ~ Cumu_DOY, data = cumu_comps_df)
 summary(lm23)
 
 plt23 <- ggplot(data = cumu_comps_df,
-                aes(x = Cumu_DOY, y = PSI_DOY)) + 
-  geom_point(aes(x = Cumu_DOY, y = PSI_DOY, color = factor(Year)), size = 3) + 
+                aes(x = Cumu_DOY, y = NMDS1)) + 
+  geom_point(aes(x = Cumu_DOY, y = NMDS1, color = factor(Year)), size = 3) + 
   geom_smooth(method = 'lm', fill = NA) + 
   geom_text_repel(aes(label = Year)) + 
-  annotate('text', x = 174, y = 55, label = "R adj. = 0.14") + 
-  annotate('text', x = 174, y = 52, label = "p > 0.10") + 
+  annotate('text', x = 174, y = 1, label = "R adj. = 0.07") + 
+  annotate('text', x = 174, y = 0.9, label = "p > 0.10") + 
   
   xlab("Yearday - negative Cumulative Flow") +
-  ylab("Summer avg. PSI") + 
+  ylab("Summer nMDS1 score") + 
   scale_color_manual(name = 'Year',
                      # labels = instyrs2,
                      values = cols2,
@@ -235,7 +251,7 @@ plt23 <- ggplot(data = cumu_comps_df,
         panel.border = element_rect(colour = "grey50", fill = NA, size = 0.4),
         # legend.key=element_blank()
   ) 
-# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8d_CumuFlw_v_SumPSI_",slopedys,".png"), plot = plt23, width = 2000, height = 1600, units = 'px')
+# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8d_2_CumuFlw_v_SumNMDS_",slopedys,".png"), plot = plt23, width = 2000, height = 1600, units = 'px')
 
 
 

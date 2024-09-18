@@ -11,6 +11,9 @@
 
 # NOTE: Flow data start in 1997, NOT 1996 (copepod data start year)
 
+# ### RUN AFTER: 'Lilly_etal_NCC_CopePhys_S5b_Fig5.R' -> to get nMDS scores 
+#     selected for summer dates
+
 library(tidyverse)
 library(lubridate)
 library(reshape2)
@@ -21,7 +24,7 @@ library(ggrepel)
 ########## Data In ########## 
 flwsfl <- read.csv('NH10_Flows_Inst_Cumu.csv')
 
-# Dataset cleanup and date conversion
+# Flow data: Dataset cleanup and date conversion
 flws_data <- flwsfl |>
     mutate_all(~ifelse(is.nan(.), NA, .)) |>
     mutate(Date = as.Date(Date, format = "%d-%b-%Y"),
@@ -57,24 +60,24 @@ for(i in 2:ncol(inst_flw_yrly)){
 }
 colnames(inst_neg1) <- unique(inst_flw$Year)
 
+bstyrdy <- yday(bstdts) # it only takes one line now, from former for-loop...
 
-
-# ### Convert Dates Yearday -> both BST and ALF_neg
-modys = c(31,28,31,30,31,30,31,31,30,31,30,31) # Number of days in each month -> to multiply by
-
-# BST dates --> convert to yearday
-bstyrdy = vector()
-for(w in 1:length(bstdts)){
-  mno = month(bstdts[w])-1 # Subtract 1 because you only want number of *whole* months prior
-  if(mno > 0){
-    mdsum = sum(modys[1:mno])
-  } else if (mno == 0){
-    mdsum = 0
-  }
-  dsum = mdsum+day(bstdts[w])
-  bstyrdy = c(bstyrdy,dsum)
-}
-yrlbls = year(bstdts)
+# # ### Convert Dates Yearday -> both BST and ALF_neg
+# modys = c(31,28,31,30,31,30,31,31,30,31,30,31) # Number of days in each month -> to multiply by
+# 
+# # BST dates --> convert to yearday
+# bstyrdy = vector()
+# for(w in 1:length(bstdts)){
+#   mno = month(bstdts[w])-1 # Subtract 1 because you only want number of *whole* months prior
+#   if(mno > 0){
+#     mdsum = sum(modys[1:mno])
+#   } else if (mno == 0){
+#     mdsum = 0
+#   }
+#   dsum = mdsum+day(bstdts[w])
+#   bstyrdy = c(bstyrdy,dsum)
+# }
+# yrlbls = year(bstdts)
 
 
 # Inst ALF dates --> convert to yearday
@@ -99,18 +102,29 @@ for(w in 1:length(inst_negdts)){
 yrlbls <- year(bstdts)
 
 
-# Combine vectors into DF -> for plotting
-# First, get avg Summer PSI
-sum_avg_psi = colMeans(sum_psi)
-# REMOVE from *flow* datasets: 1997, 2015, 2016, 2021-24
+# # Combine vectors into DF -> for plotting
+# # First, get avg Summer PSI
+# sum_avg_psi = colMeans(sum_psi)
+# # REMOVE from *flow* datasets: 1997, 2015, 2016, 2021-24
+# instyrdy2 <- instyrdy[-c(1,19,20,25:27)]
+# instyrs2 <- as.numeric(colnames(inst_neg1))[-c(1,19,20,25:27)]
+# REMOVE from *copepod* datasets: 1996,1997  - because flow doesn't have that year
+# bstyrdy2 <- bstyrdy[-c(1:2)]
+# sum_avg_psi2 <- sum_avg_psi[-c(1:2)]
+# inst_comps_df <- data.frame(cbind(instyrs2,instyrdy2,bstyrdy2,sum_avg_psi2))
+
+
+# Combine Instantaneous flow, BST date, and nMDS1 score
+# REMOVE from Flow datasets: 1997, 2015, 2016, 2021-24
 instyrdy2 <- instyrdy[-c(1,19,20,25:27)]
 instyrs2 <- as.numeric(colnames(inst_neg1))[-c(1,19,20,25:27)]
-# REMOVE from *copepod* datasets: 1996,1997  - because flow doesn't have that year
+
+# REMOVE from BST and nMDS datasets: 1996,1997  - because flow doesn't have those years
 bstyrdy2 <- bstyrdy[-c(1:2)]
-sum_avg_psi2 <- sum_avg_psi[-c(1:2)]
+sum_nmds2 <- sum_merge[-c(1:2),]
 
-inst_comps_df <- data.frame(cbind(instyrs2,instyrdy2,bstyrdy2,sum_avg_psi2))
-
+# Now combined all of the above vectors
+inst_comps_df <- data.frame(cbind(instyrs2,instyrdy2,bstyrdy2,sum_nmds2))
 
 
 ########## Plots ##########
@@ -183,19 +197,19 @@ plt11 <- ggplot(data = inst_comps_df,
 
 
 # ### Correlation: Inst_flow_neg Yrdy vs. Summer PSI
-lm12 <- lm(sum_avg_psi2 ~ instyrdy2, data = inst_comps_df)
+lm12 <- lm(NMDS1 ~ instyrdy2, data = inst_comps_df)
 summary(lm12)
 
 plt12 <- ggplot(data = inst_comps_df,
-                aes(x = instyrdy2, y = sum_avg_psi2)) + 
-  geom_point(aes(x = instyrdy2, y = sum_avg_psi2, color = factor(instyrs2)), size = 3) + 
+                aes(x = instyrdy2, y = NMDS1)) + 
+  geom_point(aes(x = instyrdy2, y = NMDS1, color = factor(instyrs2)), size = 3) + 
   geom_smooth(method = 'lm', fill = NA) + 
   geom_text_repel(aes(label = instyrs2)) + 
-  annotate('text', x = 174, y = 55, label = "R adj. = 0.13") + 
-  annotate('text', x = 174, y = 52, label = "p > 0.05") + 
+  annotate('text', x = 174, y = 1, label = "R adj. = 0.07") + 
+  annotate('text', x = 174, y = 0.9, label = "p > 0.05") + 
   
   xlab("Yearday - Instantaneous Flow Transition") +
-  ylab("Summer avg. PSI") + 
+  ylab("Summer nMDS1") + 
   scale_color_manual(name = 'Year',
                      labels = instyrs2,
                      values = colsall,
@@ -211,7 +225,7 @@ plt12 <- ggplot(data = inst_comps_df,
         # legend.key=element_blank()
   ) 
 
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8c_InstFlw_v_SumPSI.png", plot = plt12, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P8c_2_InstFlw_v_SumNMDS.png", plot = plt12, width = 2000, height = 1600, units = 'px')
 
 
 

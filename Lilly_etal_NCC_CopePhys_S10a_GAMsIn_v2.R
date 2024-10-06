@@ -1,8 +1,8 @@
 ########################################
 ##  NOAA/OSU post-doc (NCC Copepods)
-##  Step 6: Variable Coefficient GAMs, pt. 1
+##  Step 10a: Variable Coefficient GAMs, pt. 1 -> Input phys files & get to daily res
 ##  Laura E. Lilly
-##  Updated: 29 Jul 2024
+##  Updated: 1 Oct 2024
 ########################################
 # Load all physical datasets -> Then check correlation matrix to determine
 #     acceptable combos for GAMS
@@ -44,9 +44,32 @@ modys <- c(31,28,31,30,31,30,31,31,30,31,30,31)
 #   mutate(Date = as.Date(paste(Year,Mon,Day,sep = "-"),format = "%Y-%m-%d")) |>
 #   select(Date,contains(scridx))
 
-# 1a,b) Load Across & Along flows into DF
+# 1a,b) Load Across & Along flows -> then convert to 14-day cumu flows
 flow_df <- flowfl |>
   mutate(Date = as.POSIXct(Date,format="%d-%B-%Y %H:%M:%S"))
+
+
+# Calculation of cumulative flows
+nocumul <- 14  # Number of cumul. days to sum
+# cumuflws <- data.frame(magdlyalng,magdlyacrs[,2])
+
+cumuflws <- data.frame(matrix(nrow=(nrow(flow_df)-nocumul+1),ncol=2))
+
+for(n in nocumul:nrow(flow_df)){
+  # mdtid = which(magdlyall[,1] %in% nmdsdts[n])
+  # if(length(mdtid) == 0 || mdtid<nocumul){
+  #   next
+  # } else{
+    alngcum = sum(flow_df[(n-(nocumul-1)):n,2],na.rm=TRUE)
+    acrscum = sum(flow_df[(n-(nocumul-1)):n,3],na.rm=TRUE)
+    cumuflws[n-(nocumul-1),1] = alngcum
+    cumuflws[n-(nocumul-1),2] = acrscum 
+}
+# magcumudts <- data.frame(nmdsdts,magcumuall)
+cumuflws_dts <- cbind(flow_df$Date[nocumul:nrow(flow_df)], cumuflws)
+colnames(cumuflws_dts) <- c("Date","alng_mag","acrs_mag")
+
+
 
 # 1c,d) Load SST and ILD from ROMS Upwelling Indices
 upwl_df <- data.frame(rbind(uifl1,uifl2)) |>
@@ -147,7 +170,8 @@ beut_daily <- data.frame(Date = as.Date(paste(beutyrrep,beutmorep,beutdyrep,sep 
 ########### Combine variables and check correlations ############
 phys_df_1 <- join_all(list(upwl_daily,ssh_df,bv_df,cuti_daily,beut_daily), 
                     by = 'Date', type = 'left')
-phys_df <- left_join(phys_df_1, flow_df, by = 'Date') |>
+# phys_df <- left_join(phys_df_1, flow_df, by = 'Date') |>
+phys_df <- left_join(phys_df_1, cumuflws_dts, by = 'Date') |>
   filter(Date >= as.Date("1996-01-01"),
          Date <= as.Date("2020-12-31"))
 colnames(phys_df)[6:9] <- c("CUTI","BEUTI","AlongFlow","AcrossFlow")
@@ -155,7 +179,7 @@ colnames(phys_df)[6:9] <- c("CUTI","BEUTI","AlongFlow","AcrossFlow")
 
 varscorr = cor(phys_df[,2:ncol(phys_df)], use = 'complete.obs')
 corrplot(varscorr,method='number',type='upper',is.corr=FALSE,order='original', col.lim = c(-1,1))
-pairs(varscorr)
+# pairs(varscorr)
 
 
 phys_real <- phys_df[complete.cases(phys_df[,2:ncol(phys_df)]),]

@@ -14,8 +14,8 @@ library(reshape2)
 
 # ### Input copepod species file
 # copefl = read.csv(paste0('NH05_CopeDens_log_subSpp_1996_2020.csv'))
-meanfl = read.csv(paste0('NH05_CopeSpp_ClimaMeans_v2_PetersonGroups.csv'))
-cifl = read.csv(paste0('NH05_CopeSpp_ClimaCIs_v2_PetersonGroups.csv'))
+meanfl = read.csv(paste0('NH05_CopeSpp_Climatology_Means_v2_PetersonGroups.csv'))
+cifl = read.csv(paste0('NH05_CopeSpp_Climatology_CIs_v2_PetersonGroups.csv'))
 
 
 
@@ -122,13 +122,14 @@ colnames(warmcis_df)[4] <- "CI_max"
 
 ############# PLOT CLIMATOLOGIES ###########
 colcl = c("purple2","royalblue","blue3","blue2")
+symcl = c(0,1,2,17)
 
 # PLOT - Cool spp.
 plt03_1 <- ggplot(data = coolmns_df, aes(x = Month, y = value, group = variable)) +
 
   geom_ribbon(data = coolcis_df, aes(x = Month, ymin = value, ymax = CI_max, group = variable, fill = variable), alpha = 0.1) +
   geom_line(aes(group = variable, color = variable)) + 
-  geom_point(aes(group = variable, color = variable)) + 
+  geom_point(aes(group = variable, color = variable, shape = variable)) + 
   
   ylab("Log10(density)") + 
   scale_x_continuous(breaks = seq(month.name),
@@ -139,8 +140,11 @@ plt03_1 <- ggplot(data = coolmns_df, aes(x = Month, y = value, group = variable)
   scale_fill_manual(name = "Species",
                    values = colcl,
                    labels = c("Pseudocalanus spp.", "C. marshallae", "A. longiremis","C. abdominalis")) + 
+  scale_shape_manual(name = "Species",
+                     values = symcl,
+                     labels = c("Pseudocalanus spp.", "C. marshallae", "A. longiremis","C. abdominalis")) +
   
-  theme(axis.title.y = element_text(size = 14, colour = "black"),
+    theme(axis.title.y = element_text(size = 14, colour = "black"),
         axis.text.y = element_text(size = 14, colour = "black"),
         axis.title.x = element_text(size = 14, colour = "black"),
         axis.text.x = element_text(size = 14, colour = "black", 

@@ -24,21 +24,21 @@ library(mgcViz)
 ############## File load & combine ##############
 # ### CHOOSE & comment out
 
-# # # ### Copepod nMDS scores
-scrfl <- read.csv('NH05_Cope_biom_MDSscore_v4_CAM_RawDts.csv')
-scridx <- readline("Which nMDS dim? 1, 2    ") # Select nMDS dimension
-# Reconfigure nMDS file to have *dates* (not date pieces)
-cope_df <- scrfl |>
-  mutate(Date = as.Date(paste(Year,Mon,Day,sep = "-"),format = "%Y-%m-%d")) |>
-  select(Date,contains(scridx))
+# # # # ### Copepod nMDS scores
+# scrfl <- read.csv('NH05_Cope_biom_MDSscore_v4_CAM_RawDts.csv')
+# scridx <- readline("Which nMDS dim? 1, 2    ") # Select nMDS dimension
+# # Reconfigure nMDS file to have *dates* (not date pieces)
+# cope_df <- scrfl |>
+#   mutate(Date = as.Date(paste(Year,Mon,Day,sep = "-"),format = "%Y-%m-%d")) |>
+#   select(Date,contains(scridx))
 
 # # ### OR
-# # ### Copepod species
-# copefl = read.csv('NH05_CopeDens_log_subSpp_1996_2020.csv')
-# sppnm = readline("Which spp short name?   ")
-# cope_df <- copefl |>
-#   mutate(Date = as.Date(paste(Year,Mon,Day,sep = "-"),format = "%Y-%m-%d")) |>
-#   select(Date, sppnm)
+# ### Copepod species
+copefl = read.csv('NH05_CopeDens_log_subSpp_1996_2020.csv')
+sppnm = readline("Which spp short name?   ")
+cope_df <- copefl |>
+  mutate(Date = as.Date(paste(Year,Mon,Day,sep = "-"),format = "%Y-%m-%d")) |>
+  select(Date, sppnm)
 
 # Then combine Copepod DF with Phys Vars DF
 gam_df <- left_join(phys_df,cope_df,by = 'Date') |>
@@ -51,46 +51,46 @@ colnames(gam_df)[10] <- "copespp"
 ################  RUN GAMs ################
 # ### GAM 1: y ~ SST + SSH + BV + CUTI + Across_flow + 'by' terms
 gam11 = gam(copespp ~ 
-              s(DOY,bs='cc') + 
-              s(SST, k = 4) + 
-              s(SSH, k = 4) + 
+              s(DOY, bs='cc') + 
+              # s(SST, k = 4) + 
+              # s(SSH, k = 4) + 
               # s(BV, k = 4) + 
               # s(CUTI, k = 4) +
-              s(AcrossFlow, k = 4) + 
-              # s(DOY, by = SST, bs='cc') + 
+              # s(AcrossFlow, k = 4) + 
+              s(DOY, by = SST, bs='cc') + 
               # s(DOY, by = SSH, bs='cc') + 
               # s(DOY, by = BV, bs='cc') + 
               # s(DOY, by = CUTI, bs='cc') + 
-              s(DOY, by = AcrossFlow, bs='cc') + 
+              # s(DOY, by = AcrossFlow, bs='cc') + 
               factor(Year), 
             data = gam_df,
             # gamma=1.2
             )
 summary(gam11)
 AIC(gam11)
-plot(gam11)
+plot(gam11, cex.axis = 1.5,)
 
 
 # ### GAM 2: y ~ SST + SSH + BV + BEUTI + Across_flow + 'by' terms
 gam21 = gam(copespp ~ 
               s(DOY,bs='cc') + 
-              s(SST, k = 4) + 
-              s(SSH, k = 4) + 
+              # s(SST, k = 4) + 
+              # s(SSH, k = 4) + 
               # s(BV, k = 4) + 
-              # s(BEUTI, k = 4) +
-              s(AcrossFlow, k = 4) + 
-              # s(DOY, by = SST, bs='cc') + 
+              s(BEUTI, k = 4) +
+              # s(AcrossFlow, k = 4) + 
+              s(DOY, by = SST, bs='cc') + 
               # s(DOY, by = SSH, bs='cc') + 
               # s(DOY, by = BV, bs='cc') + 
               # s(DOY, by = BEUTI, bs='cc') + 
-              s(DOY, by = AcrossFlow, bs='cc') + 
+              # s(DOY, by = AcrossFlow, bs='cc') + 
               factor(Year), 
             data = gam_df,
             # gamma=1.2
 )
 summary(gam21)
 AIC(gam21)
-plot(gam21)
+plot(gam21, cex.axis = 1.5)
 
 gam21v <- getViz(gam21)
 plt21_1 <- plot(sm(gam21v,1)) + 
@@ -108,23 +108,23 @@ plt21_3 <- plot(sm(gam21v,3)) +
 # ### GAM 3: y ~ SST + SSH + BV + AlongFlow + Across_flow + 'by' terms
 gam31 = gam(copespp ~ 
               s(DOY,bs='cc') + 
-              # s(SST, k = 4) + 
-              s(SSH, k = 4) + 
+              s(SST, k = 4) + 
+              # s(SSH, k = 4) + 
               # s(BV, k = 4) + 
               s(AlongFlow, k = 4) +
-              s(AcrossFlow, k = 4) + 
+              # s(AcrossFlow, k = 4) + 
               # s(DOY, by = SST, bs='cc') + 
               # s(DOY, by = SSH, bs='cc') + 
               # s(DOY, by = BV, bs='cc') + 
-              # s(DOY, by = AlongFlow, bs='cc') + 
-              s(DOY, by = AcrossFlow, bs='cc') + 
+              s(DOY, by = AlongFlow, bs='cc') + 
+              # s(DOY, by = AcrossFlow, bs='cc') + 
               factor(Year), 
             data = gam_df,
             # gamma=1.2
 )
 summary(gam31)
 AIC(gam31)
-plot(gam31)
+plot(gam31, cex.axis = 1.5)
 
 gam31v <- getViz(gam31)
 plt31_1 <- plot(sm(gam31v,1)) + 
@@ -141,24 +141,24 @@ plt31_3 <- plot(sm(gam31v,3)) +
 
 # ### GAM 4: y ~ ILD + SSH + BV + AlongFlow + Across_flow + 'by' terms
 gam41 = gam(copespp ~ 
-              s(DOY,bs='cc') + 
+              # s(DOY,bs='cc') + 
               s(ILD, k = 4) + 
-              s(SSH, k = 4) + 
+              # s(SSH, k = 4) + 
               # s(BV, k = 4) + 
-              s(AlongFlow, k = 4) +
-              s(AcrossFlow, k = 4) + 
-              # s(DOY, by = ILD, bs='cc') + 
+              # s(AlongFlow, k = 4) +
+              # s(AcrossFlow, k = 4) + 
+              s(DOY, by = ILD, bs='cc') + 
               # s(DOY, by = SSH, bs='cc') + 
               # s(DOY, by = BV, bs='cc') + 
               # s(DOY, by = AlongFlow, bs='cc') + 
-              s(DOY, by = AcrossFlow, bs='cc') + 
+              # s(DOY, by = AcrossFlow, bs='cc') + 
               factor(Year), 
             data = gam_df,
             # gamma=1.2
 )
 summary(gam41)
 AIC(gam41)
-plot(gam41)
+plot(gam41, cex.axis = 1.5)
 
 gam41v <- getViz(gam41)
 plt41_1 <- plot(sm(gam41v,1)) + 

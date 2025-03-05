@@ -17,7 +17,7 @@ library(vegan)  # For nMDS
 
 
 # Load datafile
-nhfl <- read.csv('NH05_CopeDens_log_subSpp_1996_2020.csv')
+nhfl <- read.csv('Biol_files_2025/NH05_CopeDens_log_subSpp_1996_2020_from_CAM.csv')
 
 
 # ### Step 1: Combine date columns and create new dataframe

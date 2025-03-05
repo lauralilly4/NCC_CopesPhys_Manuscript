@@ -16,14 +16,17 @@ library(tidymv)
 
 
 # Open datafile
-# scrfl <- read.csv('NH05_Cope_biom_MDSscore_v4_CAM_RawDts.csv')
-scrfl <- read.csv('NH05_CopeDens_log10_nMDSscr_Samp_k2.csv')
+# scrfl <- read.csv('Biol_files_2025/NH05_Cope_MDSscore_biom_v4_CAM_RawDts_Nov2021.csv')
+scrfl <- read.csv('Biol_files_2025/NH05_Cope_nMDSscore_log10dens_Samples_k2_Jan2025.csv')
 colnames(scrfl) <- c("Samp_Date","NMDS1","NMDS2")
 
 
 # ### Step 0: Convert file days -> R Dates
 scrs_tib <- as_tibble(scrfl) |>
-  mutate(Samp_Date = as.Date(Samp_Date))
+  mutate(Samp_Date = as.Date(Samp_Date, "%m/%d/%Y"),
+  # Also *reverse scores* 
+          NMDS1_neg = -(NMDS1),
+          NMDS2_neg = -(NMDS2))
 
 
 # ### Step 1: Create daily-resolution time structure
@@ -73,21 +76,21 @@ yrsplt <- unique(mstrdts_tib$pltyr)
 
 
 # ### Step 3b: Calculate various models: LM (timeseries), GAMs (yearly chunks)
-lm1 <- lm(NMDS1 ~ Samp_Date, data = mstrdayall)
+lm1 <- lm(NMDS1_neg ~ Samp_Date, data = mstrdayall)
 
-lm2 <- lm(NMDS2 ~ Samp_Date, data = mstrdayall)
+lm2 <- lm(NMDS2_neg ~ Samp_Date, data = mstrdayall)
 
 
 
 # Calculate GAMs for NMDS1 & 2 -> for plotting
 # NMDS1
-gm1 <- gam(NMDS1 ~ s(DOY,bs='cc'), data = mstrdts_tib)
+gm1 <- gam(NMDS1_neg ~ s(DOY,bs='cc'), data = mstrdts_tib)
 model_gm1 <- predict_gam(gm1)
 # Rename columns of model so they can be recognized for plotting
 colnames(model_gm1) <- c("DOY","fit","se.fit","lower_ci","upper_ci")
 
 # NMDS2
-gm2 <- gam(NMDS2 ~ s(DOY,bs='cc'), data = mstrdts_tib)
+gm2 <- gam(NMDS2_neg ~ s(DOY,bs='cc'), data = mstrdts_tib)
 model_gm2 <- predict_gam(gm2)
 colnames(model_gm2) <- c("DOY","fit","se.fit","lower_ci","upper_ci")
 
@@ -98,88 +101,6 @@ colnames(model_gm2) <- c("DOY","fit","se.fit","lower_ci","upper_ci")
 
 #############################
 # #########  PLOTS  ######### 
-# ### Step 4a: Plot entire 25-yr timeseries -> for trends
-# 4.1: NMDS1
-pltx1a <- ggplot(mstrdayall, aes(x = Samp_Date, y = NMDS1)) +
-  
-  geom_point(aes(x = Samp_Date, y = NMDS1), size = 0.7, color = 'grey40') +
-  # geom_line(aes(x = Samp_Date, y = NMDS1), lwd = 0.5, linetype = "dotted") +
-  geom_smooth(method = "lm", se = FALSE) +
-
-  annotate("text", label = "Adj. R^2 = 0.01", x = mstrdayall$Samp_Date[2000], 
-           y = -0.8, size = 4, colour = "black") +
-  annotate("text", label = "p < 0.01", x = mstrdayall$Samp_Date[2000], 
-           y = -0.9, size = 4, colour = "black") +
-    
-  scale_x_continuous(breaks = seq.Date(as.Date(paste(min(year(mstrdayall$Samp_Date)),01,01,sep = "-")),
-                                       as.Date(paste(max(year(mstrdayall$Samp_Date)),01,01,sep = "-")),365),
-                     labels = c("1996","","","","2000","","","",
-                                "2004","","","","2008","","","",
-                                "2012","","","","2016","","","","2020"),
-                     limits = c(as.Date(paste(min(year(mstrdayall$Samp_Date)),01,01,sep = "-")),
-                                as.Date(paste(max(year(mstrdayall$Samp_Date)),12,31,sep = "-"))),
-                     name = "") +
-  scale_y_continuous(breaks = c(-1,-0.5,0,0.5,1),
-                     labels = c("-1","","0","","1"),
-                     limits = c(-1,1),
-                     name = "") + 
-  
-  theme(axis.title.y = element_text(size = 14, colour = "black"),
-        axis.text.y = element_text(size = 14, colour = "black"),
-        axis.title.x = element_text(size = 14, colour = "black"),
-        axis.text.x = element_text(size = 14, colour = "black", 
-                                   angle = 90, vjust = 0.5, hjust = 1),
-        panel.background = element_blank(),
-        axis.line.x = element_line(),
-        axis.line.y = element_line(linewidth = 0.5, linetype = "solid", colour = "black"),
-        )
-
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/PX1_nMDS1_LoadsTimeser.png", plot = pltx1a, width = 2000, height = 1000, units = 'px')
-
-
-
-  
-# 4.2: NMDS2
-pltx2a <- ggplot(mstrdayall, aes(x = Samp_Date, y = NMDS2)) +
-  
-  geom_point(aes(x = Samp_Date, y = NMDS2), size = 0.7, color = 'grey40') +
-  geom_smooth(method = "lm", se = FALSE) +
-
-  annotate("text", label = "Adj. R^2 = 0.03", x = mstrdayall$Samp_Date[8200], 
-           y = 0.7, size = 4, colour = "black") +
-  annotate("text", label = "p < 0.001", x = mstrdayall$Samp_Date[8200], 
-           y = 0.6, size = 4, colour = "black") +
-  
-  scale_x_continuous(breaks = seq.Date(as.Date(paste(min(year(mstrdayall$Samp_Date)),01,01,sep = "-")),
-                                       as.Date(paste(max(year(mstrdayall$Samp_Date)),01,01,sep = "-")),365),
-                     labels = c("1996","","","","2000","","","",
-                                "2004","","","","2008","","","",
-                                "2012","","","","2016","","","","2020"),
-                     limits = c(as.Date(paste(min(year(mstrdayall$Samp_Date)),01,01,sep = "-")),
-                                as.Date(paste(max(year(mstrdayall$Samp_Date)),12,31,sep = "-"))),
-                     name = "") +
-  scale_y_continuous(breaks = c(-1,-0.5,0,0.5,1),
-                     labels = c("-1","","0","","1"),
-                     limits = c(-1,1),
-                     name = "") + 
-  
-  theme(axis.title.y = element_text(size = 14, colour = "black"),
-        axis.text.y = element_text(size = 14, colour = "black"),
-        axis.title.x = element_text(size = 14, colour = "black"),
-        axis.text.x = element_text(size = 14, colour = "black", 
-                                   angle = 90, vjust = 0.5, hjust = 1),
-        panel.background = element_blank(),
-        axis.line.x = element_line(),
-        axis.line.y = element_line(linewidth = 0.5, linetype = "solid", colour = "black"),
-  )
-
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/PX1_nMDS2_LoadsTimeser.png", plot = pltx2a, width = 2000, height = 1000, units = 'px')
-
-
-
-
-
-
 # ### Step 4b: Plot all year-chunks of scores
 ## Color Scheme  -> four categories
 symc <- c(15,16,17,18,12,3,4,8)
@@ -210,7 +131,7 @@ plt02_1 <- ggplot(data = model_gm1, aes(x = DOY, y = fit)) +  # For some reason,
   
   geom_segment(aes(x = 1, xend = 365, y = 0, yend = 0), color = "grey30", lwd = 0.3) + 
   geom_smooth_ci(linetype = 'dashed', lwd = 1) +
-  geom_point(data = mstrdts_tib, aes(x = DOY, y = NMDS1, color = factor(pltyr), shape = factor(pltyr))) + 
+  geom_point(data = mstrdts_tib, aes(x = DOY, y = NMDS1_neg, color = factor(pltyr), shape = factor(pltyr))) + 
 
   ylim(c(-1.1,1.1)) +
   scale_color_manual(name = 'Year',
@@ -242,9 +163,9 @@ plt02_1 <- ggplot(data = model_gm1, aes(x = DOY, y = fit)) +  # For some reason,
   guides(color = guide_legend(ncol = 7),
          shape = guide_legend(ncol = 7))
 # # Plot w legend
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS1_YrlyCyc.png", plot = plt02_1, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS1_YrlyCyc_rev.png", plot = plt02_1, width = 2000, height = 1600, units = 'px')
 # # Plot w/o legend
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS1_YrlyCyc_noLgd.png", plot = plt02_1, width = 2000, height = 1200, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS1_YrlyCyc_noLgd_rev.png", plot = plt02_1, width = 2000, height = 1200, units = 'px')
 
 
 # PLOT 2 - NMDS2
@@ -252,7 +173,7 @@ plt02_2 <- ggplot(data = model_gm2, aes(x = DOY, y = fit)) +  # For some reason,
   
   geom_segment(aes(x = 1, xend = 365, y = 0, yend = 0), color = "grey30", lwd = 0.3) + 
   geom_smooth_ci(linetype = 'dashed', lwd = 1) +
-  geom_point(data = mstrdts_tib, aes(x = DOY, y = NMDS2, color = factor(pltyr), shape = factor(pltyr))) + 
+  geom_point(data = mstrdts_tib, aes(x = DOY, y = NMDS2_neg, color = factor(pltyr), shape = factor(pltyr))) + 
   
   ylim(c(-1.1,1.1)) +
   scale_color_manual(name = 'Year',
@@ -285,9 +206,9 @@ plt02_2 <- ggplot(data = model_gm2, aes(x = DOY, y = fit)) +  # For some reason,
          shape = guide_legend(ncol = 7))
 
 # # Plot w/ legend
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS2_YrlyCyc.png", plot = plt02_2, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS2_YrlyCyc_rev.png", plot = plt02_2, width = 2000, height = 1600, units = 'px')
 # # Plot w/o legend
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS2_YrlyCyc_noLgd.png", plot = plt02_2, width = 2000, height = 1200, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P2_nMDS2_YrlyCyc_noLgd_rev.png", plot = plt02_2, width = 2000, height = 1200, units = 'px')
 
 
 

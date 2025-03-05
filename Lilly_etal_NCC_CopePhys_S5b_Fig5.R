@@ -36,12 +36,24 @@ bstdts <- as.Date(c("1996-07-01","1997-05-01","1998-07-16",
                     "2011-03-16","2012-05-01","2013-04-01",
                     "2014-04-01","2017-07-01","2018-05-16",
                     "2019-06-01","2020-04-01"),format="%Y-%m-%d")
+
+# Also create vector of BST dates WITHOUT 1996, since we don't want to
+# include that date in these analyses
+bstdts_cut <- as.Date(c("1997-05-01","1998-07-16",
+                    "1999-05-01","2000-04-01","2001-03-16",
+                    "2002-04-16","2003-06-01","2004-05-16",
+                    "2005-08-16","2006-05-16","2007-03-16",
+                    "2008-03-01","2009-03-01","2010-06-16",
+                    "2011-03-16","2012-05-01","2013-04-01",
+                    "2014-04-01","2017-07-01","2018-05-16",
+                    "2019-06-01","2020-04-01"),format="%Y-%m-%d")
+
 # Second, calculate Winter and Summer date vectors by subtracting/adding 6 weeks
 dtinv <- 6 # Set the 'number of weeks' interval to calculate Winter and Summer 
 # dates
 
-bst_df <- data.frame(bstdts) |>
-  mutate(Date = as.Date(bstdts),
+bst_df <- data.frame(bstdts_cut) |>
+  mutate(Date = as.Date(bstdts_cut),
          BST_win = Date-(dtinv*7),
          BST_sum = Date+((dtinv+2)*7),
          DOY1 = yday(Date),
@@ -98,7 +110,11 @@ colnames(sum_merge)[c(4)] <- c("Date_SumMDS")
 
 
 #######################
-ninoyrs <- c("Warm","Neutral","Nino","Nina","Nina","Cool","Cool",
+# ninoyrs <- c("Warm","Neutral","Nino","Nina","Nina","Cool","Cool",
+#              "Warm","Neutral","Warm","Cool","Neutral","Nina","Cool",
+#              "Nino","Nina","Cool","Neutral","Neutral","Neutral","Cool","Neutral","Cool")
+# ## Again, create a versoin without 1996 info
+ninoyrs <- c("Neutral","Nino","Nina","Nina","Cool","Cool",
              "Warm","Neutral","Warm","Cool","Neutral","Nina","Cool",
              "Nino","Nina","Cool","Neutral","Neutral","Neutral","Cool","Neutral","Cool")
 
@@ -122,6 +138,8 @@ pltcolsing <- c(colcd,colnu,colla,colel,colwm)
 # FIG. 5a:  Winter nMDS score vs. BST yearday
 lm_5a <- lm(BST_DOY ~ NMDS1, data = win_lbl)
 
+# Have to keep "old" plot name (07a) for organization purposes among
+#   plots generated for figures
 plt07a <- ggplot(win_lbl, aes(x = NMDS1, y = BST_DOY)) + 
   geom_point(aes(x = NMDS1, y = BST_DOY, color = factor(Nino_type))) + 
   geom_smooth(method = 'lm', se = FALSE, color = "black", lwd = 0.3) + 
@@ -129,7 +147,6 @@ plt07a <- ggplot(win_lbl, aes(x = NMDS1, y = BST_DOY)) +
   geom_text_repel(aes(label = Year), # color = factor(psi_df$Nino_lbls)), 
                 size = 3.5, nudge_y = -2) +
   labs(x = "nMDS score", y  = "BST date (DOY)") + 
-  
   
   scale_color_manual(name = "Year-type",
                      values = pltcolsing) + 
@@ -141,11 +158,11 @@ plt07a <- ggplot(win_lbl, aes(x = NMDS1, y = BST_DOY)) +
         axis.title = element_text(size = 14, colour = "black"),
         legend.title = element_text(size = 14, colour = "black"),
         panel.background = element_blank(), 
-        panel.border = element_rect(colour = "grey50", fill = NA, size = 0.5),
+        panel.border = element_rect(colour = "grey50", fill = NA, lwd = 0.5),
         legend.key=element_blank()) 
 
 # # Plot w/ legend
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P7a_2_WinMDS1scr_v_BST.png", plot = plt07a, width = 1600, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P7a_2_WinMDS1scr_v_BST_v2no1996.png", plot = plt07a, width = 1600, height = 1600, units = 'px')
 
 
 
@@ -171,7 +188,7 @@ plt07b <- ggplot(sum_lbl, aes(x = BST_DOY, y = NMDS1)) +
         axis.title = element_text(size = 14, colour = "black"),
         legend.title = element_text(size = 14, colour = "black"),
         panel.background = element_blank(), 
-        panel.border = element_rect(colour = "grey50", fill = NA, size = 0.5),
+        panel.border = element_rect(colour = "grey50", fill = NA, linewidth = 0.5),
         legend.key=element_blank()) 
 
 # # Plot w/ legend

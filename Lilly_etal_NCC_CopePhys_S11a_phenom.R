@@ -12,33 +12,72 @@
 # See below for 'nMDS scores' option
 
 
+# #### NOTE: MUST CHOOSE SETTINGS AT SEVERAL PLACES #####
+
 library(phenomix)
 library(tidyverse)
 library(ggplot2)
 
 
 ############ Data setup - for phenomix ############ 
-### OPTION 1: Species density DF
-sppdf_phen <- sppdf_all |>
- mutate(Year = year(Date),
-        DOY = yday(Date)) |>
-        # sppcut = 10^sppcut) |>
-   na.omit()
+# ### OPTION 1: Species density DF
+# sppdf_phen <- sppdf_all |>
+#  mutate(Year = year(Date),
+#         DOY = yday(Date)) |>
+#         # sppcut = 10^sppcut) |>
+#    na.omit()
 
-# ### OPTION 2: nMDS score (population) - uncomment and run this section: 
-# scrfl <- read.csv('NH05_CopeDens_log10_nMDSscr_Samp_k2.csv')
-# colnames(scrfl) <- c("Date","NMDS1","NMDS2")
-# 
-# scrs_tib <- data.frame(scrfl) |>
-#   mutate(Date = as.Date(Date)) |>
-#   mutate(sppcut = NMDS2) |>  # SELECT: DIM 1 or 2
-#   select(Date, sppcut)
-# 
-# sppdf_phen <- scrs_tib |>
-#   mutate(Year = year(Date),
-#          DOY = yday(Date),
-#          sppcut = sppcut + 1) |>
-#   na.omit()
+### OPTION 2: nMDS score (population) - uncomment and run this section:
+scrfl <- read.csv('Biol_files_2025/NH05_Cope_nMDSscore_log10dens_Samples_k2_Jan2025.csv')
+colnames(scrfl) <- c("Date","NMDS1","NMDS2")
+
+# Name inputs - for file saving
+copespp <- readline("Which species/NMDS?  ")
+# NMDS1 - Neg/Win or Pos/Sum; NMDS2 - Neg/Sum or Pos/Win
+idxnm <- readline("Which idx (neg/pos) and seasonal shift (Win/Sum)?   ")
+
+
+# Convert dates and reverse scores, to potentially use inverses
+scrs_cln <- data.frame(scrfl) |>
+  mutate(Date = as.Date(Date, "%m/%d/%Y"),
+         # Also *reverse scores* 
+         NMDS1_neg = -(NMDS1),
+         NMDS2_neg = -(NMDS2))
+
+scrs_tib <- scrs_cln |>
+  mutate(sppcut = NMDS2) |>  # CHOOSE, pt. 1: DIM 1 or 2
+  select(Date, sppcut)
+
+
+sppdf_full <- scrs_tib |>
+  mutate(Year = year(Date),
+         DOY = yday(Date),
+         # I guess to remove negative values??
+         sppcut = sppcut + 1,
+         Year_shift = if_else(month(Date) >= 7, Year, Year-1),
+         DOY_shift = if_else(month(Date) >= 7, DOY-181, DOY+184)
+         ) |>
+  na.omit()
+
+
+# ####### CHOOSE, pt. 2: 
+  
+  ######## Cool-water vs. Warm-water profile #####
+  # If cool-water, use OPTION 1: 'Year' and 'DOY' (NOT shifted)
+  # If warm-water, use OPTION 2: 'Year_shift' and 'DOY_shift (SHIFTED by 6 months so that winter peak is in center of distribution)
+
+# # ### OPTION 1 - nMDS1 (not negative/shifted, aka "reversed"), nMDS2 (negative)
+# sppdf_phen <- sppdf_full |>
+#   select(Date, sppcut, Year, DOY)
+# colnames(sppdf_phen) <- c("Date","sppcut","Year","DOY")
+
+
+# ### OPTION 2 - nMDS1 (negative), nMDS2 (not negative, aka "reversed")
+sppdf_phen <- sppdf_full |>
+  select(Date, sppcut, Year_shift, DOY_shift, DOY)
+colnames(sppdf_phen) <- c("Date","sppcut","Year","DOY", "DOY_actual")
+
+
 
 
 ####################################
@@ -76,7 +115,8 @@ colnames(create_df) <- c("Year","DOY","sppcut")
 
 # Add '1995' to each year to get it to its proper value (right now: 1-25)
 createdf_yrs <- create_df |>
-  mutate(Year = Year + 1995)
+  # mutate(Year = Year + 1995) # ### OPTION 1
+  mutate(Year = Year + 1994) # ### OPTION 2
 
 
 # Combine original DF and 'Create' and see how they compare...
@@ -154,7 +194,9 @@ plt11_1 <- ggplot(data = createdf_yrs, aes(x = DOY, y = sppcut, group = factor(Y
                      labels = c("0","","1","","2"),
                      limits = c(0,2),
                      name = "nMDS score") +
-  
+  scale_x_continuous(breaks = c(19,186,334),
+                     labels = c("200","1","150")
+                     ) +
   
   theme(axis.title.y = element_text(size = 12, colour = "black"),
         axis.text.y = element_text(size = 9, colour = "black"),
@@ -168,7 +210,7 @@ plt11_1 <- ggplot(data = createdf_yrs, aes(x = DOY, y = sppcut, group = factor(Y
   ) + 
   
   facet_wrap(~ Year)
-# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5a_Yearly_RealvPred_",copespp,".png"), plot = plt11_1, width = 1600, height = 1200, units = 'px')
+# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5a_Yearly_RealvPred_",copespp,"_v2_",idxnm,"Shift.png"), plot = plt11_1, width = 1600, height = 1200, units = 'px')
 
 
 
@@ -184,10 +226,10 @@ plt11_2 <- ggplot(data = cumu50dts_spp, aes(x = Year, y = DOY)) +
   geom_smooth(data = cumu50dts_spp, method = "lm", se = TRUE, color = "black") +
   geom_point(data = cumu50dts_pred, aes(x = Year, y = DOY), color = "magenta4", fill = "magenta3", size = 2) + 
   geom_smooth(data = cumu50dts_pred, method = "lm", se = TRUE, color = "magenta4", linetype = "dashed") +
-  annotate("text", x = 2016, y = 255, label = "Spp: Adj. R-sq. = 0.17") + 
-  annotate("text", x = 2016, y = 250, label = "p-val < 0.05") + 
-  annotate("text", x = 2016, y = 240, label = "Pred: Adj. R-sq. = 0.21") + 
-  annotate("text", x = 2016, y = 235, label = "p-val < 0.05") + 
+  annotate("text", x = 2016, y = 255, label = "Spp: Adj. R-sq. = 0.11") + 
+  annotate("text", x = 2016, y = 250, label = "p-val > 0.05") + 
+  annotate("text", x = 2016, y = 240, label = "Pred: Adj. R-sq. = 0.06") + 
+  annotate("text", x = 2016, y = 235, label = "p-val > 0.05") + 
 
   ylim(c(140,260)) + 
   
@@ -201,7 +243,7 @@ plt11_2 <- ggplot(data = cumu50dts_spp, aes(x = Year, y = DOY)) +
         axis.line.x = element_line(),
         axis.line.y = element_line(linewidth = 0.5, linetype = "solid", colour = "black"),
   )
-# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5b_DOYTrends_",copespp,".png"), plot = plt11_2, width = 1600, height = 1600, units = 'px')
+# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5b_DOYTrends_",copespp,"_v2_",idxnm,"Shift.png"), plot = plt11_2, width = 1600, height = 1600, units = 'px')
 
 
 # PLOT 3: Real vs. Modeled 50% cumu. 
@@ -227,6 +269,6 @@ plt11_3 <- ggplot(data = peakdoy_cmb, aes(x = DOY_spp, y = DOY_pred)) + geom_poi
         axis.line.x = element_line(),
         axis.line.y = element_line(linewidth = 0.5, linetype = "solid", colour = "black"),
   )
-# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5c_DOYcomp_",copespp,".png"), plot = plt11_3, width = 1600, height = 1600, units = 'px')
+# ggsave(paste0("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P5c_DOYcomp_",copespp,"_v2_",idxnm,"Shift.png"), plot = plt11_3, width = 1600, height = 1600, units = 'px')
 
 

@@ -8,6 +8,7 @@
 
 
 library(tidyverse)
+library(lubridate)
 
 
 # # Input BST dates as vector
@@ -23,7 +24,7 @@ library(tidyverse)
 
 bst_fl = read.csv("Biol_files_2025/NH05_Cope_BST_BFT_Dates_from_CAM_v2_Dec2024.csv")
 
-bst_df <- bst_fl |>
+DOY_df <- bst_fl |>
   select(Year, Start.Date, End.Date) |>
   mutate(BST = as.Date(Start.Date, format = "%m/%d/%Y"),
          BFT = as.Date(End.Date, format = "%m/%d/%Y")) |>
@@ -32,7 +33,7 @@ bst_df <- bst_fl |>
 
 
 ### BST ###
-bstdts <- bst_df$BST
+bstdts <- DOY_df$BST
 bst_doy <- yday(bstdts)
 bst_yr <- year(bstdts)
 ninoyrs <- c("Neutral","Nino","Nina","Nina","Cool","Cool",
@@ -47,7 +48,7 @@ bst_df <- data.frame(cbind(bst_yr,bst_doy,ninoyrs)) |>
 
 
 ### BFT ###
-bftdts <- bst_df$BFT
+bftdts <- DOY_df$BFT
 bft_doy <- yday(bftdts)
 bft_yr <- year(bftdts)
 ninoyrs <- c("Neutral","Nino","Nina","Nina","Cool","Cool",
@@ -150,6 +151,6 @@ plt02 <- ggplot(data = bft_df, aes(x = bft_yr, y = bft_doy)) +
   )
 
 # # Plot w/ legend
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/PSX2_Year_v_BFTDOY_no1996_v2.png", plot = plt01, width = 2000, height = 1000, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/PSX2_Year_v_BFTDOY_no1996_v2.png", plot = plt02, width = 2000, height = 1000, units = 'px')
 
 

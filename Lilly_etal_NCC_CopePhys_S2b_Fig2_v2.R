@@ -14,68 +14,71 @@ library(reshape2)
 
 # ### Input copepod species file
 # copefl = read.csv(paste0('NH05_CopeDens_log_subSpp_1996_2020.csv'))
-meanfl = read.csv(paste0('NH05_CopeSpp_Climatology_Means_v2_PetersonGroups.csv'))
-cifl = read.csv(paste0('NH05_CopeSpp_Climatology_CIs_v2_PetersonGroups.csv'))
+meanfl = read.csv(paste0('Biol_files_2025/NH05_CopeSpp_Climatology_Means_v2_PetersonGroups.csv'))
+cifl = read.csv(paste0('Biol_files_2025/NH05_CopeSpp_Climatology_CIs_v2_PetersonGroups.csv'))
 
 
 
-######### CALCULATE BOXPLOTS #########
-# Select species
-copespp = readline("Which species? [PSEUDO,CALMAR,ACALON,CENABD,METR,CALPAC,ACATON,OITSIM,NEOPLU]  ")
-sppcut = as.data.frame(cbind(copefl$Mon,copefl$Day,copefl$Year,copefl[,copespp]))
-colnames(sppcut) = c(colnames(copefl[1:3]),copespp)
+# ######### OLD - TO DELETE ##########
+# 
+# ######### CALCULATE BOXPLOTS #########
+# # Select species
+# copespp = readline("Which species? [CLAUSO_SUM,PSEUDO,CALMAR,ACALON,CENABD,METR,CALPAC,ACATON,OITSIM,NEOPLU]  ")
+# sppcut = as.data.frame(cbind(copefl$Mon,copefl$Day,copefl$Year,copefl[,copespp]))
+# colnames(sppcut) = c(colnames(copefl[1:3]),copespp)
+# 
+# # ### Step 1: Average all values within the same year-month (e.g., 1996-4)
+# yrsunq = unique(sppcut$Year)
+# mosunq = unique(sppcut$Mon)
+# 
+# yrmoavgs = data.frame(matrix(ncol=ncol(sppcut),nrow=length(yrsunq)*length(mosunq)))
+# di = 0
+# 
+# for(sy in 1:length(yrsunq)){
+#   for(sm in 1:length(mosunq)){
+#     di = di+1
+#     rowcut = sppcut[which(sppcut$Year %in% yrsunq[sy] & sppcut$Mon %in% mosunq[sm]),]
+#     if(nrow(rowcut) == 0){
+#       rowavg = c(mosunq[sm],1,yrsunq[sy],NA)
+#     } else if(nrow(rowcut) == 1) {
+#       rowavg = c(rowcut[1:3],rowcut[4])
+#     } else {
+#       rowavg = c(rowcut[1,1:3],mean(rowcut[,4],na.rm=TRUE))
+#     }
+#     yrmoavgs[di,] = rowavg
+#   }
+# }
+# colnames(yrmoavgs) = colnames(sppcut)
+# 
+# # Then calculate yearly avgs (across all months) -> for climatologies of *means*
+# moavgs = data.frame(matrix(ncol=ncol(yrmoavgs)-2,nrow=length(mosunq)))
+# cimarg = data.frame(matrix(ncol=ncol(yrmoavgs)-2,nrow=length(mosunq)))
+# mosort = sort(mosunq)
+# 
+# for(mm in 1:length(mosort)){
+#   mavg = mean(yrmoavgs[(yrmoavgs[,1] %in% mosort[mm]),4],na.rm=TRUE)
+#   cimargin = qt(0.975,df=length(yrmoavgs[(yrmoavgs[,1] %in% mosort[mm]),4])-1)*(sd(yrmoavgs[(yrmoavgs[,1] %in% mosort[mm]),4],na.rm=TRUE))/sqrt(length(yrmoavgs[(yrmoavgs[,1] %in% mosort[mm]),4]))
+#   
+#   moavgs[mm,] = c(mosort[mm],mavg)
+#   cimarg[mm,] = c(mosort[mm],cimargin)
+# }
+# 
+# # ### Calculate MIN, MAX, and DIFF between monthly means for each spp.
+# sppmin = min(meanfl[,which(colnames(meanfl) == paste0(copespp,"_mean"))])
+# sppmax = max(meanfl[,which(colnames(meanfl) == paste0(copespp,"_mean"))])
+# sppdif = sppmax/sppmin
+# 
+# ######### END OF OLD STUFF ######### 
 
-
-# ### Step 1: Average all values within the same year-month (e.g., 1996-4)
-yrsunq = unique(sppcut$Year)
-mosunq = unique(sppcut$Mon)
-
-yrmoavgs = data.frame(matrix(ncol=ncol(sppcut),nrow=length(yrsunq)*length(mosunq)))
-di = 0
-
-for(sy in 1:length(yrsunq)){
-  for(sm in 1:length(mosunq)){
-    di = di+1
-    rowcut = sppcut[which(sppcut$Year %in% yrsunq[sy] & sppcut$Mon %in% mosunq[sm]),]
-    if(nrow(rowcut) == 0){
-      rowavg = c(mosunq[sm],1,yrsunq[sy],NA)
-    } else if(nrow(rowcut) == 1) {
-      rowavg = c(rowcut[1:3],rowcut[4])
-    } else {
-      rowavg = c(rowcut[1,1:3],mean(rowcut[,4],na.rm=TRUE))
-    }
-    yrmoavgs[di,] = rowavg
-  }
-}
-
-colnames(yrmoavgs) = colnames(sppcut)
-
-
-# Then calculate yearly avgs (across all months) -> for climatologies of *means*
-moavgs = data.frame(matrix(ncol=ncol(yrmoavgs)-2,nrow=length(mosunq)))
-cimarg = data.frame(matrix(ncol=ncol(yrmoavgs)-2,nrow=length(mosunq)))
-mosort = sort(mosunq)
-
-for(mm in 1:length(mosort)){
-  mavg = mean(yrmoavgs[(yrmoavgs[,1] %in% mosort[mm]),4],na.rm=TRUE)
-  cimargin = qt(0.975,df=length(yrmoavgs[(yrmoavgs[,1] %in% mosort[mm]),4])-1)*(sd(yrmoavgs[(yrmoavgs[,1] %in% mosort[mm]),4],na.rm=TRUE))/sqrt(length(yrmoavgs[(yrmoavgs[,1] %in% mosort[mm]),4]))
-  
-  moavgs[mm,] = c(mosort[mm],mavg)
-  cimarg[mm,] = c(mosort[mm],cimargin)
-}
-
-
-# ### Calculate MIN, MAX, and DIFF between monthly means for each spp.
-sppmin = min(meanfl[,which(colnames(meanfl) == paste0(copespp,"_mean"))])
-sppmax = max(meanfl[,which(colnames(meanfl) == paste0(copespp,"_mean"))])
-sppdif = sppmax/sppmin
 
 
 ############# CALCS for CLIMATOLOGIES ############# 
 # First, get Cool and Warm DFs -> to melt
 # Mean
 coolmns_df <- meanfl |>
-  select(Month,PSEUDO_mean,CALMAR_mean,ACALON_mean,CENABD_mean) |>
+  select(Month,PSEUDO_mean,CALMAR_mean,ACALON_mean,
+         # CENABD_mean
+         ) |>
   melt(id = "Month")
 
 # CIs -> get two columns (min and max)
@@ -85,11 +88,15 @@ cismax <- cbind(meanfl[,1],meanfl[,2:ncol(meanfl)]+cifl[,2:ncol(cifl)])
 colnames(cismax)[1] <- "Month"
 
 coolcis_min <- cismin |>
-  select(Month,PSEUDO_mean,CALMAR_mean,ACALON_mean,CENABD_mean) |>
+  select(Month,PSEUDO_mean,CALMAR_mean,ACALON_mean,
+         # CENABD_mean
+         ) |>
   melt(id = "Month")
   # rename(CI_min = value)
 coolcis_max <- cismax |>
-  select(Month,PSEUDO_mean,CALMAR_mean,ACALON_mean,CENABD_mean) |>
+  select(Month,PSEUDO_mean,CALMAR_mean,ACALON_mean,
+         # CENABD_mean
+         ) |>
   melt(id = "Month") |>
   rename(CI_max = value)
 
@@ -98,17 +105,26 @@ colnames(coolcis_df)[4] <- "CI_max"
 
 
 warmmns_df <- meanfl |>
- select(Month,ACATON_mean,CALPAC_mean,CALSTY_mean,CALTENU_mean,CLASO_mean,
-        CORANG_mean,CTNCAL_mean,MESOCALTEN_mean,PARA_mean,CLAARC_mean) |>
+ select(Month,ACATON_mean,CALPAC_mean,CALSTY_mean,CALTENU_mean,
+        CORANG_mean,CTNCAL_mean,MESOCALTEN_mean,PARA_mean,
+        # CLASO_mean,CLAARC_mean
+        CLAUSO_SUM_mean
+        ) |>
  melt(id = "Month")
 
 warmcis_min <- cismin |>
-  select(Month,ACATON_mean,CALPAC_mean,CALSTY_mean,CALTENU_mean,CLASO_mean,
-         CORANG_mean,CTNCAL_mean,MESOCALTEN_mean,PARA_mean,CLAARC_mean) |>
+  select(Month,ACATON_mean,CALPAC_mean,CALSTY_mean,CALTENU_mean,
+         CORANG_mean,CTNCAL_mean,MESOCALTEN_mean,PARA_mean,
+         # CLASO_mean,CLAARC_mean
+         CLAUSO_SUM_mean
+         ) |>
   melt(id = "Month")
 warmcis_max <- cismax |>
-  select(Month,ACATON_mean,CALPAC_mean,CALSTY_mean,CALTENU_mean,CLASO_mean,
-         CORANG_mean,CTNCAL_mean,MESOCALTEN_mean,PARA_mean,CLAARC_mean) |>
+  select(Month,ACATON_mean,CALPAC_mean,CALSTY_mean,CALTENU_mean,
+         CORANG_mean,CTNCAL_mean,MESOCALTEN_mean,PARA_mean,
+         # CLASO_mean,CLAARC_mean
+         CLAUSO_SUM_mean
+         ) |>
   melt(id = "Month") |>
   rename(CI_max = value)
 
@@ -154,7 +170,7 @@ plt03_1 <- ggplot(data = coolmns_df, aes(x = Month, y = value, group = variable)
         axis.line.x = element_line(),
         axis.line.y = element_line(linewidth = 0.5, linetype = "solid", colour = "black"),
   )
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P3a_CoolSppClims.png", plot = plt03_1, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P3a_CoolSppClims_3spp.png", plot = plt03_1, width = 2000, height = 1600, units = 'px')
 
 
 
@@ -174,19 +190,28 @@ plt03_2 <- ggplot(data = warmmns_df, aes(x = Month, y = value, group = variable)
                      labels = month.name) + 
   scale_color_manual(name = "Species",
                      values = colwm,
+                     # labels = c("A. tonsa","C. pacificus","Co. styliremis","Co. tenuis",
+                     #            "Clasocalanus spp.","Cr. anglicus","Ct. vanus","Mc. tenuicornis",
+                     #            "Paracalanus spp.","Cl. arcuicornis")) +
                      labels = c("A. tonsa","C. pacificus","Co. styliremis","Co. tenuis",
-                                "Clasocalanus spp.","Cr. anglicus","Ct. vanus","Mc. tenuicornis",
-                                "Paracalanus spp.","Cl. arcuicornis")) +
+                                "Cr. anglicus","Ct. vanus","Mc. tenuicornis",
+                                "Paracalanus spp.","Clausocalanus spp.")) +
   scale_fill_manual(name = "Species",
                     values = colwm,
+                    # labels = c("A. tonsa","C. pacificus","Co. styliremis","Co. tenuis",
+                    #            "Clasocalanus spp.","Cr. anglicus","Ct. vanus","Mc. tenuicornis",
+                    #            "Paracalanus spp.","Cl. arcuicornis")) +
                     labels = c("A. tonsa","C. pacificus","Co. styliremis","Co. tenuis",
-                               "Clasocalanus spp.","Cr. anglicus","Ct. vanus","Mc. tenuicornis",
-                               "Paracalanus spp.","Cl. arcuicornis")) +
+                               "Cr. anglicus","Ct. vanus","Mc. tenuicornis",
+                               "Paracalanus spp.","Clausocalanus spp.")) +
   scale_shape_manual(name = "Species",
                      values = symwm,
+                     # labels = c("A. tonsa","C. pacificus","Co. styliremis","Co. tenuis",
+                     #           "Clasocalanus spp.","Cr. anglicus","Ct. vanus","Mc. tenuicornis",
+                     #           "Paracalanus spp.","Cl. arcuicornis")) +
                      labels = c("A. tonsa","C. pacificus","Co. styliremis","Co. tenuis",
-                                "Clasocalanus spp.","Cr. anglicus","Ct. vanus","Mc. tenuicornis",
-                                "Paracalanus spp.","Cl. arcuicornis")) +
+                                "Cr. anglicus","Ct. vanus","Mc. tenuicornis",
+                                "Paracalanus spp.","Clausocalanus spp.")) +
   
   theme(axis.title.y = element_text(size = 14, colour = "black"),
         axis.text.y = element_text(size = 14, colour = "black"),
@@ -198,4 +223,4 @@ plt03_2 <- ggplot(data = warmmns_df, aes(x = Month, y = value, group = variable)
         axis.line.x = element_line(),
         axis.line.y = element_line(linewidth = 0.5, linetype = "solid", colour = "black"),
   )
-# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P3b_WarmSppClims.png", plot = plt03_2, width = 2000, height = 1600, units = 'px')
+# ggsave("../../../OSU_NOAA_postdoc/Project1_SeasonalUpwelling/Figures/Plots_v4/P3b_WarmSppClims_9spp_ClausoSum.png", plot = plt03_2, width = 2000, height = 1600, units = 'px')
